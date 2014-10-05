@@ -4,10 +4,11 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.Parts
 {
-    public class PartMessage : MessageBase, ITimelineMessage
+    public class PartMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
     {
         public string Name { get; set; }
         public string Type { get; set; }

@@ -5,10 +5,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Web;
-using Glimpse.Core.Framework;
-using Glimpse.Core.Message;
 using Glimpse.Orchard.Models;
-using Glimpse.Orchard.Services;
+using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.Shapes;
 using Microsoft.CSharp.RuntimeBinder;
 using Orchard;
@@ -26,7 +24,7 @@ namespace Glimpse.Orchard.AlternateImplementations
     public class GlimpseDisplayManager : IDisplayManager
     {
         private readonly Lazy<IShapeTableLocator> _shapeTableLocator;
-        private readonly IGlimpseService _glimpseService;
+        private readonly IPerformanceMonitor _performanceMonitor;
         private readonly IWorkContextAccessor _workContextAccessor;
         private readonly IEnumerable<IShapeDisplayEvents> _shapeDisplayEvents;
 
@@ -42,10 +40,10 @@ namespace Glimpse.Orchard.AlternateImplementations
             IWorkContextAccessor workContextAccessor,
             IEnumerable<IShapeDisplayEvents> shapeDisplayEvents,
             Lazy<IShapeTableLocator> shapeTableLocator,
-            IGlimpseService glimpseService)
+            IPerformanceMonitor performanceMonitor)
         {
             _shapeTableLocator = shapeTableLocator;
-            _glimpseService = glimpseService;
+            _performanceMonitor = performanceMonitor;
             _workContextAccessor = workContextAccessor;
             _shapeDisplayEvents = shapeDisplayEvents;
             T = NullLocalizer.Instance;
@@ -94,7 +92,7 @@ namespace Glimpse.Orchard.AlternateImplementations
                 }
             }
             
-            var duration = _glimpseService.Time(() =>
+            _performanceMonitor.PublishTimedAction(() =>
             {
 
                 // invoking ShapeMetadata displaying events
@@ -158,18 +156,12 @@ namespace Glimpse.Orchard.AlternateImplementations
 
                 // invoking ShapeMetadata displayed events
                 shapeMetadata.Displayed.Invoke(action => action(displayedContext), Logger);
-            });
-
-
-            _glimpseService.MessageBroker.Publish(new ShapeMessage
+            }, () => new ShapeMessage
             {
                 Name = shapeBinding.BindingName,
-                Duration = duration.Duration,
                 EventCategory = TimelineCategories.Shapes,
                 EventName = "Shape Displaying",
-                EventSubText = shapeBinding.BindingSource,
-                Offset = duration.Offset,
-                StartTime = duration.StartTime
+                EventSubText = shapeBinding.BindingSource
             });
 
             return shape.Metadata.ChildContent;

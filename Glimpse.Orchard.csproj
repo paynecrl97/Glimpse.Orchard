@@ -47,6 +47,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Autofac, Version=3.0.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\lib\autofac\Autofac.dll</HintPath>
+    </Reference>
     <Reference Include="Glimpse.AspNet">
       <HintPath>..\..\..\packages\Glimpse.AspNet.1.8.0\lib\net45\Glimpse.AspNet.dll</HintPath>
     </Reference>
@@ -92,6 +96,10 @@
       <Project>{9916839C-39FC-4CEB-A5AF-89CA7E87119F}</Project>
       <Name>Orchard.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Orchard.Users\Orchard.Users.csproj">
+      <Project>{79AED36E-ABD0-4747-93D3-8722B042454B}</Project>
+      <Name>Orchard.Users</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Orchard.Widgets\Orchard.Widgets.csproj">
       <Project>{194D3CCC-1153-474D-8176-FDE8D7D0D0BD}</Project>
       <Name>Orchard.Widgets</Name>
@@ -99,21 +107,32 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Services\" />
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AlternateImplementations\GlimpseAuthorizer.cs" />
+    <Compile Include="AlternateImplementations\GlimpseDefaultContentManager.cs" />
     <Compile Include="AlternateImplementations\GlimpseContentFieldDriverCoordinator.cs" />
     <Compile Include="AlternateImplementations\GlimpseContentPartDriverCoordinator.cs" />
     <Compile Include="AlternateImplementations\GlimpseDisplayManager.cs" />
     <Compile Include="AlternateImplementations\GlimpseWidgetFilter.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Models\TimelineCategories.cs" />
+    <Compile Include="PerfMon\Extensions\GlimpseTimerResultExtensions.cs" />
+    <Compile Include="PerfMon\Models\ITimedPerfMonMessage.cs" />
+    <Compile Include="PerfMon\Models\TimedActionResult.cs" />
+    <Compile Include="PerfMon\Models\TimerResult.cs" />
+    <Compile Include="PerfMon\Services\DefaultPerformanceMonitor.cs" />
+    <Compile Include="PerfMon\Services\GlimpsePerformanceMonitor.cs" />
+    <Compile Include="PerfMon\Services\IPerformanceMonitor.cs" />
     <Compile Include="Permissions\Permissions.cs" />
     <Compile Include="SecurityPolicies\GlimpseSecurityPolicy.cs" />
-    <Compile Include="Services\IGlimpseService.cs" />
+    <Compile Include="Tabs\Authorizer\Authorizer.cs" />
+    <Compile Include="Tabs\ContentManager\ContentManager.cs" />
     <Compile Include="Tabs\Layers\Layers.cs" />
     <Compile Include="Tabs\Fields\Fields.cs" />
     <Compile Include="Tabs\Shapes\Shapes.cs" />

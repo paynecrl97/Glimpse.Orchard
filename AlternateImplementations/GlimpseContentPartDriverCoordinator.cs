@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Glimpse.Orchard.Models;
-using Glimpse.Orchard.Services;
+using Glimpse.Orchard.PerfMon.Extensions;
+using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.Parts;
 using Orchard;
 using Orchard.ContentManagement.Drivers;
@@ -19,89 +20,36 @@ namespace Glimpse.Orchard.AlternateImplementations {
     public class GlimpseContentPartDriverCoordinator : ContentPartDriverCoordinator
     {
         private readonly IEnumerable<IContentPartDriver> _drivers;
-        private readonly IGlimpseService _glimpseService;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
-        public GlimpseContentPartDriverCoordinator(IEnumerable<IContentPartDriver> drivers, IContentDefinitionManager contentDefinitionManager, IGlimpseService glimpseService)
+        public GlimpseContentPartDriverCoordinator(IEnumerable<IContentPartDriver> drivers, IContentDefinitionManager contentDefinitionManager,  IPerformanceMonitor performanceMonitor)
             : base(drivers, contentDefinitionManager)
         {
             _drivers = drivers;
-            _glimpseService = glimpseService;
+            _performanceMonitor = performanceMonitor;
         }
 
         public override void BuildDisplay(BuildDisplayContext context) {
             _drivers.Invoke(driver => {
-                var publish = false;
-                var duration = _glimpseService.Time(() => {
+                var timedResult = _performanceMonitor.Time(() => {
                     var result = driver.BuildDisplay(context);
-                    publish = result != null;
-                    if (publish)
+                    var publish = result != null;
+                    if (publish) {
                         result.Apply(context);
+                    }
+
+                    return publish;
                 });
 
-                if (publish) {
-                    _glimpseService.MessageBroker.Publish(new PartMessage {
-                        Duration = duration.Duration,
+                if (timedResult.ActionResult)
+                {
+                    _performanceMonitor.PublishMessage(new PartMessage
+                    {
                         EventCategory = TimelineCategories.Parts,
                         EventName = "Build Display : " + driver.GetPartInfo().First().PartName,
                         EventSubText = context.ContentItem.ContentType,
                         Name = context.ContentItem.ContentType,
-                        Offset = duration.Offset,
-                        StartTime = duration.StartTime
-                    });
-                }
-            }, Logger);
-        }
-
-        public override void BuildEditor(BuildEditorContext context) {
-            _drivers.Invoke(driver =>
-            {
-                var publish = false;
-                var duration = _glimpseService.Time(() => {
-                    var result = driver.BuildEditor(context);
-                    publish = result != null;
-                    if (publish)
-                        result.Apply(context);
-                });
-
-                if (publish)
-                {
-                    _glimpseService.MessageBroker.Publish(new PartMessage
-                    {
-                        Duration = duration.Duration,
-                        EventCategory = TimelineCategories.Parts,
-                        EventName = "Build Editor : " + driver.GetPartInfo().First().PartName,
-                        EventSubText = context.ContentItem.ContentType,
-                        Name = context.ContentItem.ContentType,
-                        Offset = duration.Offset,
-                        StartTime = duration.StartTime
-                    });
-                }
-            }, Logger);
-        }
-
-        public override void UpdateEditor(UpdateEditorContext context) {
-            _drivers.Invoke(driver =>
-            {
-                var publish = false;
-                var duration = _glimpseService.Time(() =>{
-                    var result = driver.UpdateEditor(context);
-                    publish = result != null;
-                    if (publish)
-                        result.Apply(context);
-                });
-
-                if (publish)
-                {
-                    _glimpseService.MessageBroker.Publish(new PartMessage
-                    {
-                        Duration = duration.Duration,
-                        EventCategory = TimelineCategories.Parts,
-                        EventName = "Update Editor : " + driver.GetPartInfo().First().PartName,
-                        EventSubText = context.ContentItem.ContentType,
-                        Name = context.ContentItem.ContentType,
-                        Offset = duration.Offset,
-                        StartTime = duration.StartTime
-                    });
+                    }.AsTimedMessage(timedResult.TimerResult));
                 }
             }, Logger);
         }

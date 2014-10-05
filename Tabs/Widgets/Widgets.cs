@@ -7,17 +7,11 @@ using Glimpse.Core.Tab.Assist;
 
 namespace Glimpse.Orchard.Tabs.Widgets
 {
-    public class WidgetMessage : MessageBase, ITimelineMessage
+    public class WidgetMessage : MessageBase
     {
         public string Name { get; set; }
         public string Type { get; set; }
         public string Zone { get; set; }
-        public TimeSpan Offset { get; set; }
-        public TimeSpan Duration { get; set; }
-        public DateTime StartTime { get; set; }
-        public string EventName { get; set; }
-        public TimelineCategoryItem EventCategory { get; set; }
-        public string EventSubText { get; set; }
     }
 
     public class WidgetTab : TabBase, ITabSetup, IKey, ITabLayout

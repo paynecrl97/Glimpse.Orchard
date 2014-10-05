@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
 using System.Web.Mvc;
-using Glimpse.Core.Framework;
-using Glimpse.Core.Message;
 using Glimpse.Orchard.Models;
-using Glimpse.Orchard.Services;
+using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.Layers;
 using Glimpse.Orchard.Tabs.Widgets;
 using Orchard;
@@ -32,20 +29,20 @@ namespace Glimpse.Orchard.AlternateImplementations
         private readonly IRuleManager _ruleManager;
         private readonly IWidgetsService _widgetsService;
         private readonly IOrchardServices _orchardServices;
-        private readonly IGlimpseService _glimpseService;
+        private readonly IPerformanceMonitor _performanceMonitor;
 
         public GlimpseWidgetFilter(
             IWorkContextAccessor workContextAccessor,
             IRuleManager ruleManager,
             IWidgetsService widgetsService,
             IOrchardServices orchardServices,
-            IGlimpseService glimpseService)
+            IPerformanceMonitor performanceMonitor)
         {
             _workContextAccessor = workContextAccessor;
             _ruleManager = ruleManager;
             _widgetsService = widgetsService;
             _orchardServices = orchardServices;
-            _glimpseService = glimpseService;
+            _performanceMonitor = performanceMonitor;
             Logger = NullLogger.Instance;
             T = NullLocalizer.Instance;
         }
@@ -81,22 +78,14 @@ namespace Glimpse.Orchard.AlternateImplementations
                 // ignore the rule if it fails to execute
                 try
                 {
-                    var layerRuleMatches = true;
                     var currentLayer = activeLayer;
-                    var duration = _glimpseService.Time(() => { layerRuleMatches = _ruleManager.Matches(currentLayer.Record.LayerRule); });
-
-
-                    _glimpseService.MessageBroker.Publish(new LayerMessage
-                    {
-                        Active = layerRuleMatches,
-                        Name = activeLayer.Record.Name,
-                        Rule = activeLayer.Record.LayerRule,//
-                        Duration = duration.Duration,
+                    var layerRuleMatches = _performanceMonitor.PublishTimedAction(() => _ruleManager.Matches(currentLayer.Record.LayerRule), r=> new LayerMessage {
+                        Active = r,
+                        Name = currentLayer.Record.Name,
+                        Rule = currentLayer.Record.LayerRule, //
                         EventCategory = TimelineCategories.Layers,
                         EventName = "Layer Evaluation",
-                        EventSubText = activeLayer.Record.Name,
-                        Offset = duration.Offset,
-                        StartTime = duration.StartTime
+                        EventSubText = currentLayer.Record.Name,
                     });
 
                     if (layerRuleMatches)
@@ -150,25 +139,13 @@ namespace Glimpse.Orchard.AlternateImplementations
                     continue;
                 }
 
-                dynamic widgetShape = null;
-                var currentWidgetPart = widgetPart;
+                var widgetShape = _orchardServices.ContentManager.BuildDisplay(widgetPart);
 
-                var duration = _glimpseService.Time(() =>
+                _performanceMonitor.PublishMessage(new WidgetMessage
                 {
-                    widgetShape = _orchardServices.ContentManager.BuildDisplay(currentWidgetPart);
-                });
-
-                _glimpseService.MessageBroker.Publish(new WidgetMessage
-                {
-                    Name = currentWidgetPart.Name,
-                    Type = currentWidgetPart.ContentItem.ContentType,
-                    Zone = currentWidgetPart.Zone,
-                    Duration = duration.Duration,
-                    EventCategory = TimelineCategories.Widgets,
-                    EventName = "Widget Build Display",
-                    EventSubText = currentWidgetPart.ContentItem.ContentType,
-                    Offset = duration.Offset,
-                    StartTime = duration.StartTime
+                    Name = widgetPart.Name,
+                    Type = widgetPart.ContentItem.ContentType,
+                    Zone = widgetPart.Zone
                 });
 
                 zones[widgetPart.Record.Zone].Add(widgetShape, widgetPart.Record.Position);

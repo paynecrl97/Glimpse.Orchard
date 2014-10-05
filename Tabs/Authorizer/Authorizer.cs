@@ -5,15 +5,15 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
-using Glimpse.Orchard.PerfMon.Models;
+using ITimedMessage = Glimpse.Orchard.PerfMon.Models.ITimedPerfMonMessage;
 
-namespace Glimpse.Orchard.Tabs.Layers
+namespace Glimpse.Orchard.Tabs.Authorizer
 {
-    public class LayerMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
+    public class AuthorizerMessage : MessageBase, ITimelineMessage, ITimedMessage
     {
+        public int ContentId { get; set; }
         public string Name { get; set; }
-        public string Rule { get; set; }
-        public bool Active { get; set; }
+        public string ContentType { get; set; }
         public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime StartTime { get; set; }
@@ -22,7 +22,7 @@ namespace Glimpse.Orchard.Tabs.Layers
         public string EventSubText { get; set; }
     }
 
-    public class LayerTab : TabBase, ITabSetup, IKey, ITabLayout
+    public class ContentManagerTab : TabBase, ITabSetup, IKey, ITabLayout
     {
         private static readonly object layout = TabLayout.Create()
             .Row(r =>
@@ -35,22 +35,22 @@ namespace Glimpse.Orchard.Tabs.Layers
 
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<LayerMessage>().ToList();
+            return context.GetMessages<AuthorizerMessage>().ToList();
         }
 
         public override string Name
         {
-            get { return "Layers"; }
+            get { return "Authorizer"; }
         }
 
         public void Setup(ITabSetupContext context)
         {
-            context.PersistMessages<LayerMessage>();
+            context.PersistMessages<AuthorizerMessage>();
         }
 
         public string Key
         {
-            get { return "glimpse_orchard_layers"; }
+            get { return "glimpse_orchard_authorizer"; }
         }
 
         public object GetLayout()
@@ -59,19 +59,18 @@ namespace Glimpse.Orchard.Tabs.Layers
         }
     }
 
-    public class LayerMessagesConverter : SerializationConverter<IEnumerable<LayerMessage>>
+    public class ContentManagerMessagesConverter : SerializationConverter<IEnumerable<AuthorizerMessage>>
     {
-        public override object Convert(IEnumerable<LayerMessage> messages)
+        public override object Convert(IEnumerable<AuthorizerMessage> messages)
         {
-            var root = new TabSection("Layer Name", "Layer Rule", "Active", "Evaluation Time");
+            var root = new TabSection("Content Id", "Name", "Content Type", "Evaluation Time");
             foreach (var message in messages)
             {
                 root.AddRow()
+                    .Column(message.ContentId)
                     .Column(message.Name)
-                    .Column(message.Rule)
-                    .Column(message.Active)
-                    .Column(message.Duration)
-                    .StrongIf(message.Active);
+                    .Column(message.ContentType)
+                    .Column(message.Duration);
             }
 
             return root.Build();

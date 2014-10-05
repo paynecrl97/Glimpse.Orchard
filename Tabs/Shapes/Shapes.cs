@@ -3,10 +3,11 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.Shapes
 {
-    public class ShapeMessage : MessageBase, ITimelineMessage
+    public class ShapeMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
     {
         public string Name { get; set; }
         public TimeSpan Offset { get; set; }
