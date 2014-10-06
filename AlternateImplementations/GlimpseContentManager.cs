@@ -94,16 +94,16 @@ namespace Glimpse.Orchard.AlternateImplementations {
                 // obtain the root records based on version options
                 if (options.VersionRecordId != 0)
                 {
-                    Trace.WriteLine("options.VersionRecordId != 0");
+                    //Trace.WriteLine("options.VersionRecordId != 0");
                     // short-circuit if item held in session
                     if (session.RecallVersionRecordId(options.VersionRecordId, out contentItem)) {
-                        Trace.WriteLine("Content item was recalled from the session");
+                        //Trace.WriteLine("Content item was recalled from the session");
                         return contentItem;
                     }
 
-                    Trace.WriteLine("Content item was not in the session");
+                    //Trace.WriteLine("Content item was not in the session");
                     versionRecord = _contentItemVersionRepository.Get(options.VersionRecordId);
-                    Trace.WriteLine("Got versionRecord from repo");
+                    //Trace.WriteLine("Got versionRecord from repo");
                 }
                 else if (session.RecallContentRecordId(id, out contentItem)) {
                     // try to reload a previously loaded published content item
@@ -111,7 +111,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
                     Trace.WriteLine("options.VersionRecordId == 0 and Content item was recalled from the session");
                     if (options.IsPublished)
                     {
-                        Trace.WriteLine("returning published content item");
+                        //Trace.WriteLine("returning published content item");
                         return contentItem;
                     }
 
@@ -143,27 +143,27 @@ namespace Glimpse.Orchard.AlternateImplementations {
                             contentItemVersionCriteria.SetFetchMode("ContentItemRecord.ContentType", FetchMode.Eager);
                             contentItemVersionCriteria.SetMaxResults(1);
                         });
-                    Trace.WriteLine("finished");
+                    //Trace.WriteLine("finished");
 
                     if (options.VersionNumber != 0)
                     {
-                        Trace.WriteLine("options.versionnumber != 0");
+                        //Trace.WriteLine("options.versionnumber != 0");
                         versionRecord = contentItemVersionRecords.FirstOrDefault(
                             x => x.Number == options.VersionNumber) ??
                                         _contentItemVersionRepository.Get(
                                             x => x.ContentItemRecord.Id == id && x.Number == options.VersionNumber);
-                        Trace.WriteLine("got version record");
+                        //Trace.WriteLine("got version record");
                     }
                     else
                     {
-                        Trace.WriteLine("options.versionnumber == 0");
+                        //Trace.WriteLine("options.versionnumber == 0");
                         versionRecord = contentItemVersionRecords.FirstOrDefault();
-                        Trace.WriteLine("got version record from the result of GetManyImplementation");
+                        //Trace.WriteLine("got version record from the result of GetManyImplementation");
                     }
                 }
 
 
-                Trace.WriteLineIf(versionRecord==null, "version record is null");
+                //Trace.WriteLineIf(versionRecord==null, "version record is null");
 
                 // no record means content item is not in db
                 if (versionRecord == null) {
@@ -180,40 +180,40 @@ namespace Glimpse.Orchard.AlternateImplementations {
                     }
                 }
 
-                Trace.WriteLine("getting version from session");
+                //Trace.WriteLine("getting version from session");
                 // return item if obtained earlier in session
                 if (session.RecallVersionRecordId(versionRecord.Id, out contentItem))
                 {
-                    Trace.WriteLine("got content item from session");
+                    //Trace.WriteLine("got content item from session");
                     if (options.IsDraftRequired && versionRecord.Published)
                     {
-                        Trace.WriteLine("draft version is required- building new version");
+                        //Trace.WriteLine("draft version is required- building new version");
                         return BuildNewVersion(contentItem);
                     }
                     return contentItem;
                 }
 
                 // allocate instance and set record property
-                Trace.WriteLine("creating new content item");
+                //Trace.WriteLine("creating new content item");
                 contentItem = New(versionRecord.ContentItemRecord.ContentType.Name);
-                Trace.WriteLine("new content item created");
+                //Trace.WriteLine("new content item created");
                 contentItem.VersionRecord = versionRecord;
 
                 // store in session prior to loading to avoid some problems with simple circular dependencies
-                Trace.WriteLine("storing in session");
+                //Trace.WriteLine("storing in session");
                 session.Store(contentItem);
-                Trace.WriteLine("content item placed into session");
+                //Trace.WriteLine("content item placed into session");
 
                 // create a context with a new instance to load            
                 var context = new LoadContentContext(contentItem);
 
                 // invoke handlers to acquire state, or at least establish lazy loading callbacks
 
-                Trace.WriteLine("invoking handler loading");
+                //Trace.WriteLine("invoking handler loading");
                 Handlers.Invoke(handler => handler.Loading(context), Logger);
-                Trace.WriteLine("invoking handlers loaded");
+                //Trace.WriteLine("invoking handlers loaded");
                 Handlers.Invoke(handler => handler.Loaded(context), Logger);
-                Trace.WriteLine("handlers finished");
+                //Trace.WriteLine("handlers finished");
 
                 // when draft is required and latest is published a new version is appended 
                 if (options.IsDraftRequired && versionRecord.Published) {
@@ -232,14 +232,14 @@ namespace Glimpse.Orchard.AlternateImplementations {
 
         public virtual new ContentItem New(string contentType)
         {
-            Trace.WriteLine("creating a new content item of type " + contentType);
+            //Trace.WriteLine("creating a new content item of type " + contentType);
             var contentTypeDefinition = _contentDefinitionManager.GetTypeDefinition(contentType);
             if (contentTypeDefinition == null)
             {
-                Trace.WriteLine("content type definition is null");
+                //Trace.WriteLine("content type definition is null");
                 contentTypeDefinition = new ContentTypeDefinitionBuilder().Named(contentType).Build();
             }
-            Trace.WriteLine("got content type definition");
+            //Trace.WriteLine("got content type definition");
 
             // create a new kernel for the model instance
             var context = new ActivatingContentContext
@@ -253,9 +253,9 @@ namespace Glimpse.Orchard.AlternateImplementations {
             Trace.WriteLine("invoking activating");
             Handlers.Invoke(handler =>
             {
-                Trace.WriteLine("activating " + handler.GetType().Name);
+                //Trace.WriteLine("activating " + handler.GetType().Name);
                 handler.Activating(context);
-                Trace.WriteLine("finished activating " + handler.GetType().Name);
+                //Trace.WriteLine("finished activating " + handler.GetType().Name);
             }, Logger);
             Trace.WriteLine("finished activating");
 
@@ -275,9 +275,9 @@ namespace Glimpse.Orchard.AlternateImplementations {
             Trace.WriteLine("invoking activated");
             Handlers.Invoke(handler => 
             {
-                Trace.WriteLine("activated " + handler.GetType().Name);
+                //Trace.WriteLine("activated " + handler.GetType().Name);
                 handler.Activated(context2);
-                Trace.WriteLine("finished activated " + handler.GetType().Name);
+                //Trace.WriteLine("finished activated " + handler.GetType().Name);
             }, Logger);
             Trace.WriteLine("finished activated");
 
