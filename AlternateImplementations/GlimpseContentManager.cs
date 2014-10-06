@@ -232,7 +232,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
 
         public virtual new ContentItem New(string contentType)
         {
-            Trace.WriteLine("creating a new content item of type" + contentType);
+            Trace.WriteLine("creating a new content item of type " + contentType);
             var contentTypeDefinition = _contentDefinitionManager.GetTypeDefinition(contentType);
             if (contentTypeDefinition == null)
             {
@@ -251,7 +251,12 @@ namespace Glimpse.Orchard.AlternateImplementations {
 
             // invoke handlers to weld aspects onto kernel
             Trace.WriteLine("invoking activating");
-            Handlers.Invoke(handler => handler.Activating(context), Logger);
+            Handlers.Invoke(handler =>
+            {
+                Trace.WriteLine("activating " + handler.GetType().Name);
+                handler.Activating(context);
+                Trace.WriteLine("finished activating " + handler.GetType().Name);
+            }, Logger);
             Trace.WriteLine("finished activating");
 
             Trace.WriteLine("building content item");
@@ -268,7 +273,12 @@ namespace Glimpse.Orchard.AlternateImplementations {
             context2.ContentItem.ContentManager = this;
 
             Trace.WriteLine("invoking activated");
-            Handlers.Invoke(handler => handler.Activated(context2), Logger);
+            Handlers.Invoke(handler => 
+            {
+                Trace.WriteLine("activated " + handler.GetType().Name);
+                handler.Activated(context2);
+                Trace.WriteLine("finished activated " + handler.GetType().Name);
+            }, Logger);
             Trace.WriteLine("finished activated");
 
             var context3 = new InitializingContentContext
@@ -278,9 +288,19 @@ namespace Glimpse.Orchard.AlternateImplementations {
             };
 
             Trace.WriteLine("invoking Initializing");
-            Handlers.Invoke(handler => handler.Initializing(context3), Logger);
+            Handlers.Invoke(handler => 
+            {
+                Trace.WriteLine("Initializing " + handler.GetType().Name);
+                handler.Initializing(context3);
+                Trace.WriteLine("finished Initializing " + handler.GetType().Name);
+            }, Logger);
             Trace.WriteLine("finished Initializing");
-            Handlers.Invoke(handler => handler.Initialized(context3), Logger);
+            Handlers.Invoke(handler => 
+            {
+                Trace.WriteLine("Initialized " + handler.GetType().Name);
+                handler.Initialized(context3);
+                Trace.WriteLine("finished Initialized " + handler.GetType().Name);
+            }, Logger);
             Trace.WriteLine("finished Initialized");
 
             // composite result is returned

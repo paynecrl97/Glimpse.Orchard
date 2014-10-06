@@ -64,14 +64,13 @@ namespace Glimpse.Orchard.Tabs.Layers
         public override object Convert(IEnumerable<LayerMessage> messages)
         {
             var root = new TabSection("Layer Name", "Layer Rule", "Active", "Evaluation Time");
-            foreach (var message in messages)
-            {
+            foreach (var message in messages) {
                 root.AddRow()
-                    .Column(message.Name)
-                    .Column(message.Rule)
-                    .Column(message.Active)
-                    .Column(message.Duration)
-                    .StrongIf(message.Active);
+                    .Column(message.EventName)
+                    .Column(message.EventCategory)
+                    .Column(message.EventSubText)
+                    .Column(message.Duration);
+                //.StrongIf(message.Active);
             }
 
             return root.Build();
