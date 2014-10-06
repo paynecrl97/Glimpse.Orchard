@@ -155,7 +155,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
                     {
                         Trace.WriteLine("options.versionnumber == 0");
                         versionRecord = contentItemVersionRecords.FirstOrDefault();
-                        Trace.WriteLine("got version record");
+                        Trace.WriteLine("got version record from the result of GetManyImplementation");
                     }
                 }
 
