@@ -159,6 +159,9 @@ namespace Glimpse.Orchard.AlternateImplementations {
                     }
                 }
 
+
+                Trace.WriteLineIf(versionRecord==null, "version record is null");
+
                 // no record means content item is not in db
                 if (versionRecord == null) {
                     // check in memory
@@ -174,27 +177,40 @@ namespace Glimpse.Orchard.AlternateImplementations {
                     }
                 }
 
+                Trace.WriteLine("getting version from session");
                 // return item if obtained earlier in session
-                if (session.RecallVersionRecordId(versionRecord.Id, out contentItem)) {
-                    if (options.IsDraftRequired && versionRecord.Published) {
+                if (session.RecallVersionRecordId(versionRecord.Id, out contentItem))
+                {
+                    Trace.WriteLine("got content item from session");
+                    if (options.IsDraftRequired && versionRecord.Published)
+                    {
+                        Trace.WriteLine("draft version is required- building new version");
                         return BuildNewVersion(contentItem);
                     }
                     return contentItem;
                 }
 
                 // allocate instance and set record property
+                Trace.WriteLine("creating new content item");
                 contentItem = New(versionRecord.ContentItemRecord.ContentType.Name);
+                Trace.WriteLine("new content item created");
                 contentItem.VersionRecord = versionRecord;
 
                 // store in session prior to loading to avoid some problems with simple circular dependencies
+                Trace.WriteLine("storing in session");
                 session.Store(contentItem);
+                Trace.WriteLine("content item placed into session");
 
                 // create a context with a new instance to load            
                 var context = new LoadContentContext(contentItem);
 
                 // invoke handlers to acquire state, or at least establish lazy loading callbacks
+
+                Trace.WriteLine("invoking handler loading");
                 Handlers.Invoke(handler => handler.Loading(context), Logger);
+                Trace.WriteLine("invoking handlers loaded");
                 Handlers.Invoke(handler => handler.Loaded(context), Logger);
+                Trace.WriteLine("handlers finished");
 
                 // when draft is required and latest is published a new version is appended 
                 if (options.IsDraftRequired && versionRecord.Published) {
