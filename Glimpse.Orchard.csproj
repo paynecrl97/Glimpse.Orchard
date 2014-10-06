@@ -60,6 +60,10 @@
       <HintPath>..\..\..\packages\Glimpse.1.8.2\lib\net45\Glimpse.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="NHibernate, Version=3.3.1.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\lib\nhibernate\NHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.ComponentModel.DataAnnotations">
@@ -117,7 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AlternateImplementations\GlimpseAuthorizer.cs" />
-    <Compile Include="AlternateImplementations\GlimpseDefaultContentManager.cs" />
+    <Compile Include="AlternateImplementations\GlimpseContentManager.cs" />
     <Compile Include="AlternateImplementations\GlimpseContentFieldDriverCoordinator.cs" />
     <Compile Include="AlternateImplementations\GlimpseContentPartDriverCoordinator.cs" />
     <Compile Include="AlternateImplementations\GlimpseDisplayManager.cs" />
