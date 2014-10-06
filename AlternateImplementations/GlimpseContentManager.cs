@@ -290,14 +290,14 @@ namespace Glimpse.Orchard.AlternateImplementations {
             Trace.WriteLine("invoking Initializing");
             Handlers.Invoke(handler => 
             {
-                Trace.WriteLine("Initializing " + handler.GetType().Name);
+                //Trace.WriteLine("Initializing " + handler.GetType().Name);
                 handler.Initializing(context3);
                 Trace.WriteLine("finished Initializing " + handler.GetType().Name);
             }, Logger);
             Trace.WriteLine("finished Initializing");
             Handlers.Invoke(handler => 
             {
-                Trace.WriteLine("Initialized " + handler.GetType().Name);
+                //Trace.WriteLine("Initialized " + handler.GetType().Name);
                 handler.Initialized(context3);
                 Trace.WriteLine("finished Initialized " + handler.GetType().Name);
             }, Logger);
