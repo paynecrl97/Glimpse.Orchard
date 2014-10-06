@@ -15,6 +15,7 @@ using Orchard.Caching;
 using Orchard.ContentManagement;
 using Orchard.ContentManagement.Handlers;
 using Orchard.ContentManagement.MetaData;
+using Orchard.ContentManagement.MetaData.Builders;
 using Orchard.ContentManagement.Records;
 using Orchard.Core.Title.Models;
 using Orchard.Data;
@@ -33,6 +34,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
         private readonly IRepository<ContentItemVersionRecord> _contentItemVersionRepository;
         private readonly IRepository<ContentItemRecord> _contentItemRepository;
         private readonly Lazy<ISessionLocator> _sessionLocator;
+        private readonly IContentDefinitionManager _contentDefinitionManager;
 
         public GlimpseContentManager(
             IComponentContext context,
@@ -57,6 +59,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
             _contentItemVersionRepository = contentItemVersionRepository;
             _contentItemRepository = contentItemRepository;
             _sessionLocator = sessionLocator;
+            _contentDefinitionManager = contentDefinitionManager;
         }
 
         public new virtual ContentItem Get(int id) {
@@ -225,6 +228,64 @@ namespace Glimpse.Orchard.AlternateImplementations {
                 EventName = "Get: " + r.ContentType,
                 EventSubText = GetContentName(r)
             });
+        }
+
+        public virtual new ContentItem New(string contentType)
+        {
+            Trace.WriteLine("creating a new content item of type" + contentType);
+            var contentTypeDefinition = _contentDefinitionManager.GetTypeDefinition(contentType);
+            if (contentTypeDefinition == null)
+            {
+                Trace.WriteLine("content type definition is null");
+                contentTypeDefinition = new ContentTypeDefinitionBuilder().Named(contentType).Build();
+            }
+            Trace.WriteLine("got content type definition");
+
+            // create a new kernel for the model instance
+            var context = new ActivatingContentContext
+            {
+                ContentType = contentTypeDefinition.Name,
+                Definition = contentTypeDefinition,
+                Builder = new ContentItemBuilder(contentTypeDefinition)
+            };
+
+            // invoke handlers to weld aspects onto kernel
+            Trace.WriteLine("invoking activating");
+            Handlers.Invoke(handler => handler.Activating(context), Logger);
+            Trace.WriteLine("finished activating");
+
+            Trace.WriteLine("building content item");
+            var contentItem = context.Builder.Build();
+            Trace.WriteLine("finished building content item");
+
+            var context2 = new ActivatedContentContext
+            {
+                ContentType = contentType,
+                ContentItem = contentItem
+            };
+
+            // back-reference for convenience (e.g. getting metadata when in a view)
+            context2.ContentItem.ContentManager = this;
+
+            Trace.WriteLine("invoking activated");
+            Handlers.Invoke(handler => handler.Activated(context2), Logger);
+            Trace.WriteLine("finished activated");
+
+            var context3 = new InitializingContentContext
+            {
+                ContentType = context2.ContentType,
+                ContentItem = context2.ContentItem,
+            };
+
+            Trace.WriteLine("invoking Initializing");
+            Handlers.Invoke(handler => handler.Initializing(context3), Logger);
+            Trace.WriteLine("finished Initializing");
+            Handlers.Invoke(handler => handler.Initialized(context3), Logger);
+            Trace.WriteLine("finished Initialized");
+
+            // composite result is returned
+            Trace.WriteLine("content item created");
+            return context3.ContentItem;
         }
 
         private IEnumerable<ContentItemVersionRecord> GetManyImplementation(QueryHints hints, Action<ICriteria, ICriteria> predicate)
