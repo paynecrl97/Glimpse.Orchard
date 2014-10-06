@@ -59,21 +59,21 @@ namespace Glimpse.Orchard.Tabs.Layers
         }
     }
 
-    public class LayerMessagesConverter : SerializationConverter<IEnumerable<LayerMessage>>
-    {
-        public override object Convert(IEnumerable<LayerMessage> messages)
-        {
-            var root = new TabSection("Layer Name", "Layer Rule", "Active", "Evaluation Time");
-            foreach (var message in messages) {
-                root.AddRow()
-                    .Column(message.EventName)
-                    .Column(message.EventCategory)
-                    .Column(message.EventSubText)
-                    .Column(message.Duration);
-                //.StrongIf(message.Active);
-            }
+    //public class LayerMessagesConverter : SerializationConverter<IEnumerable<LayerMessage>>
+    //{
+    //    public override object Convert(IEnumerable<LayerMessage> messages)
+    //    {
+    //        var root = new TabSection("Layer Name", "Layer Rule", "Active", "Evaluation Time");
+    //        foreach (var message in messages) {
+    //            root.AddRow()
+    //                .Column(message.EventName)
+    //                .Column(message.EventCategory)
+    //                .Column(message.EventSubText)
+    //                .Column(message.Duration);
+    //            //.StrongIf(message.Active);
+    //        }
 
-            return root.Build();
-        }
-    }
+    //        return root.Build();
+    //    }
+    //}
 }
