@@ -5,12 +5,21 @@ using Glimpse.Core.Framework;
 using Glimpse.Core.Message;
 using Glimpse.Orchard.PerfMon.Extensions;
 using Glimpse.Orchard.PerfMon.Models;
+using Orchard.ContentManagement.Utilities;
 using Orchard.Environment.Extensions;
 using TimerResult = Glimpse.Orchard.PerfMon.Models.TimerResult;
 
 namespace Glimpse.Orchard.PerfMon.Services {
     [OrchardSuppressDependency("Glimpse.Orchard.PerfMon.Services.DefaultPerformanceMonitor")]
     public class GlimpsePerformanceMonitor : DefaultPerformanceMonitor, IPerformanceMonitor {
+        private readonly LazyField<IMessageBroker> _messageBroker;
+
+        public GlimpsePerformanceMonitor() {
+            _messageBroker = new LazyField<IMessageBroker>();
+
+            _messageBroker.Loader(GetMessageBroker);
+        }
+
         public new TimerResult Time(Action action)
         {
             var executionTimer = GetTimer();
@@ -65,16 +74,14 @@ namespace Glimpse.Orchard.PerfMon.Services {
 
         public new void PublishMessage(object message)
         {
-            var messageBroker = GetMessageBroker();
-
-            messageBroker.Publish(message);
+            _messageBroker.Value.Publish(message);
         }
 
         private IExecutionTimer GetTimer() {
             return ((GlimpseRuntime)HttpContext.Current.Application.Get("__GlimpseRuntime")).Configuration.TimerStrategy.Invoke();
         }
 
-        private IMessageBroker GetMessageBroker() {
+        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker) {
             return ((GlimpseRuntime)HttpContext.Current.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
         }
 
