@@ -5,20 +5,33 @@ using Glimpse.Core.Framework;
 using Glimpse.Core.Message;
 using Glimpse.Orchard.PerfMon.Extensions;
 using Glimpse.Orchard.PerfMon.Models;
+using Orchard.Environment.Extensions;
 using TimerResult = Glimpse.Orchard.PerfMon.Models.TimerResult;
 
 namespace Glimpse.Orchard.PerfMon.Services {
-    public class GlimpsePerformanceMonitor : IPerformanceMonitor {
-        public TimerResult Time(Action action)
+    [OrchardSuppressDependency("Glimpse.Orchard.PerfMon.Services.DefaultPerformanceMonitor")]
+    public class GlimpsePerformanceMonitor : DefaultPerformanceMonitor, IPerformanceMonitor {
+        public new TimerResult Time(Action action)
         {
             var executionTimer = GetTimer();
+
+            if (executionTimer == null){
+                return base.Time(action);
+            }
+
             return executionTimer.Time(action).ToGenericTimerResult();
         }
 
-        public TimedActionResult<T> Time<T>(Func<T> action) {
+        public new TimedActionResult<T> Time<T>(Func<T> action)
+        {
             var result = default(T);
 
             var executionTimer = GetTimer();
+
+            if (executionTimer == null) {
+                return base.Time(action);
+            }
+
             var duration = executionTimer.Time(()=> { result = action(); }).ToGenericTimerResult();
 
             return new TimedActionResult<T> {
@@ -27,29 +40,30 @@ namespace Glimpse.Orchard.PerfMon.Services {
             };
         }
 
-        public void PublishTimedAction(Action action)
+        public new void PublishTimedAction(Action action)
         {
             PublishTimedAction(action, () => new GlimpseTimedMessage());
         }
 
-        public void PublishTimedAction<T>(Action action, Func<T> messageFactory) where T : ITimedPerfMonMessage
+        public new void PublishTimedAction<T>(Action action, Func<T> messageFactory) where T : ITimedPerfMonMessage
         {
             var timedResult = Time(action);
             PublishMessage(messageFactory().AsTimedMessage(timedResult));
         }
 
-        public T PublishTimedAction<T>(Func<T> action) {
+        public new T PublishTimedAction<T>(Func<T> action)
+        {
             return PublishTimedAction(action, t => new GlimpseTimedMessage());
         }
 
-        public T PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory) where TMessage : ITimedPerfMonMessage
+        public new T PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory) where TMessage : ITimedPerfMonMessage
         {
             var timedResult = Time(action);
             PublishMessage(messageFactory(timedResult.ActionResult).AsTimedMessage(timedResult.TimerResult));
             return timedResult.ActionResult;
         }
 
-        public void PublishMessage(object message)
+        public new void PublishMessage(object message)
         {
             var messageBroker = GetMessageBroker();
 
