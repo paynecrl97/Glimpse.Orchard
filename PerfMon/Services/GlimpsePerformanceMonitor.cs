@@ -78,11 +78,21 @@ namespace Glimpse.Orchard.PerfMon.Services {
         }
 
         private IExecutionTimer GetTimer() {
-            return ((GlimpseRuntime)HttpContext.Current.Application.Get("__GlimpseRuntime")).Configuration.TimerStrategy.Invoke();
+            var context = HttpContext.Current;
+            if (context == null) {
+                return null;
+            }
+
+            return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.TimerStrategy.Invoke();
         }
 
-        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker) {
-            return ((GlimpseRuntime)HttpContext.Current.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
+        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker){
+            var context = HttpContext.Current;
+            if (context == null){
+                return new NullMessageBroker();
+            }
+
+            return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
         }
 
         private class GlimpseTimedMessage : ITimedMessage, ITimedPerfMonMessage
@@ -96,6 +106,16 @@ namespace Glimpse.Orchard.PerfMon.Services {
             public TimeSpan Offset { get; set; }
             public TimeSpan Duration { get; set; }
             public DateTime StartTime { get; set; }
+        }
+
+        public class NullMessageBroker : IMessageBroker  {
+            public void Publish<T>(T message) {}
+
+            public Guid Subscribe<T>(Action<T> action) {
+                return Guid.NewGuid();
+            }
+
+            public void Unsubscribe<T>(Guid subscriptionId) {}
         }
     }
 }
