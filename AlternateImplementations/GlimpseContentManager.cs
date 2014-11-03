@@ -57,7 +57,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
             {
                 ContentId = id,
                 EventCategory = TimelineCategories.ContentManagement,
-                EventName = "Get: " + r.ContentType,
+                EventName = "Get: " + GetContentType(id, r, options),
                 EventSubText = GetContentName(r)
             });
         }
@@ -91,6 +91,15 @@ namespace Glimpse.Orchard.AlternateImplementations {
             if (content.Has<LayerPart>()) { return content.As<LayerPart>().Name; }
 
             return "Unknown";
+        }
+
+        private string GetContentType(int id, ContentItem item, VersionOptions options)
+        {
+            if (item != null)
+            {
+                return item.ContentType;
+            }
+            return (options.VersionRecordId == 0) ? String.Format("Content item: {0} is not published.", id) : "Unknown content type.";
         }
     }
 }
