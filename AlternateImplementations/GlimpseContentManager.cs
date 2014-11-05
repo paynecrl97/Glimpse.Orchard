@@ -57,7 +57,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
             {
                 ContentId = id,
                 EventCategory = TimelineCategories.ContentManagement,
-                EventName = "Get: " + r.ContentType,
+                EventName = "Get: " + r.ContentType, // test
                 EventSubText = GetContentName(r)
             });
         }
