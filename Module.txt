@@ -1,10 +1,12 @@
 ﻿Name: Glimpse.Orchard
 AntiForgery: enabled
-Author: The Orchard Team
-Website: http://orchardproject.net
-Version: 1.0
-OrchardVersion: 1.0
+Author: Christopher John Payne, Bede Gaming
+Website: https://github.com/BedeGaming/Glimpse.Orchard
+Version: 0.4
+OrchardVersion: 1.7
 Description: Description for the module
 Features:
     Glimpse.Orchard:
-        Description: Description for feature Glimpse.Orchard.
+		Category: Performance
+		Name: Glimpse for Orchard
+        Description: Adds detailed information about the performance of your Orchard site to the Glimpse site performance monitoring tool.
