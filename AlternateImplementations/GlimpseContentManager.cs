@@ -17,7 +17,8 @@ using Orchard.Environment.Extensions;
 using Orchard.Users.Models;
 using Orchard.Widgets.Models;
 
-namespace Glimpse.Orchard.AlternateImplementations {
+namespace Glimpse.Orchard.AlternateImplementations
+{
     [OrchardSuppressDependency("Orchard.ContentManagement.DefaultContentManager")]
     public class GlimpseContentManager : DefaultContentManager, IContentManager
     {
@@ -39,15 +40,18 @@ namespace Glimpse.Orchard.AlternateImplementations {
             ShellSettings shellSettings,
             ISignals signals,
             IPerformanceMonitor performanceMonitor)
-            : base(context, contentTypeRepository, contentItemRepository, contentItemVersionRepository, contentDefinitionManager, cacheManager, contentManagerSession, contentDisplay, sessionLocator, handlers, identityResolverSelectors, sqlStatementProviders, shellSettings, signals) {
+            : base(context, contentTypeRepository, contentItemRepository, contentItemVersionRepository, contentDefinitionManager, cacheManager, contentManagerSession, contentDisplay, sessionLocator, handlers, identityResolverSelectors, sqlStatementProviders, shellSettings, signals)
+        {
             _performanceMonitor = performanceMonitor;
         }
 
-        public new virtual ContentItem Get(int id) {
+        public new virtual ContentItem Get(int id)
+        {
             return Get(id, VersionOptions.Published);
         }
 
-        public new virtual ContentItem Get(int id, VersionOptions options) {
+        public new virtual ContentItem Get(int id, VersionOptions options)
+        {
             return Get(id, options, QueryHints.Empty);
         }
 
@@ -57,7 +61,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
             {
                 ContentId = id,
                 EventCategory = TimelineCategories.ContentManagement,
-                EventName = "Get: " + r.ContentType,
+                EventName = "Get: " + GetContentType(id, r, options),
                 EventSubText = GetContentName(r)
             });
         }
@@ -74,13 +78,24 @@ namespace Glimpse.Orchard.AlternateImplementations {
         }
 
 
-        public new dynamic BuildDisplay(IContent content, string displayType = "", string groupId = "") {
-            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), r => new ContentManagerMessage {
+        public new dynamic BuildDisplay(IContent content, string displayType = "", string groupId = "")
+        {
+            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), r => new ContentManagerMessage
+            {
                 ContentId = content.ContentItem.Id,
                 EventCategory = TimelineCategories.ContentManagement,
                 EventName = "Build Display: " + content.ContentItem.ContentType,
                 EventSubText = GetContentName(content)
             });
+        }
+
+        private string GetContentType(int id, ContentItem item, VersionOptions options)
+        {
+            if (item != null)
+            {
+                return item.ContentType;
+            }
+            return (options.VersionRecordId == 0) ? String.Format("Content item: {0} is not published.", id) : "Unknown content type.";
         }
 
         private string GetContentName(IContent content)

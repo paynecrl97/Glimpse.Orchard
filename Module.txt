@@ -1,7 +1,7 @@
 ﻿Name: Glimpse.Orchard
 AntiForgery: enabled
 Author: Christopher John Payne, Bede Gaming
-Website: https://github.com/paynecrl97/Glimpse.Orchard
+Website: https://github.com/BedeGaming/Glimpse.Orchard
 Version: 0.4
 OrchardVersion: 1.7
 Description: Description for the module
