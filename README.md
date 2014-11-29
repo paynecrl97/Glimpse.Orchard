@@ -23,3 +23,10 @@ You should also be able to enable Glimpse, and then see the Glimpse bar appear a
 However, you will not be able to see any Orchard specific tabs yet. To enable these tabs, you need to enable the `Glimpse for Orchard` feature.
 
 ## Enabling Orchard specific tabs
+
+If you would like to see tabs that are specific to Orchard (eg Widgets, Layers, Content Manager etc...), then you will need to do two more things:
+
+1. Find the `Orchard.Web` project in your solution in Visual Studio, and add a project reference to the `Glimpse.Orchard` project you added to your solution during the installatiuon steps.
+2. Build and run your solution, navigate to the `Modules` page and your admin area, find the feature called `Glimpse for Orchard` and enable it.
+ 
+Once you have done this, you can enable and disable the Orchard tabs by simply toggling the `Glimpse for Orchard` feature on each of your sites.
