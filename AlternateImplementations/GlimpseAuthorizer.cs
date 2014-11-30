@@ -36,11 +36,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
         }
 
         public new bool Authorize(Permission permission, IContent content, LocalizedString message) {
-            return _performanceMonitor.PublishTimedAction(() => base.Authorize(permission, content, message), r => new AuthorizerMessage {
-                EventCategory = TimelineCategories.Authorization,
-                EventName = "Authorization",
-                EventSubText = permission.Name
-            });
+            return _performanceMonitor.PublishTimedAction(() => base.Authorize(permission, content, message), r => new AuthorizerMessage{}, TimelineCategories.Authorization, "Authorize", permission.Name).ActionResult;
         }
 
     }

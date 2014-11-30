@@ -9,7 +9,7 @@ using ITimedMessage = Glimpse.Orchard.PerfMon.Models.ITimedPerfMonMessage;
 
 namespace Glimpse.Orchard.Tabs.Authorizer
 {
-    public class AuthorizerMessage : MessageBase, ITimelineMessage, ITimedMessage
+    public class AuthorizerMessage : MessageBase, ITimedMessage
     {
         public int ContentId { get; set; }
         public string Name { get; set; }
@@ -17,9 +17,6 @@ namespace Glimpse.Orchard.Tabs.Authorizer
         public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime StartTime { get; set; }
-        public string EventName { get; set; }
-        public TimelineCategoryItem EventCategory { get; set; }
-        public string EventSubText { get; set; }
     }
 
     public class ContentManagerTab : TabBase, ITabSetup, IKey, ITabLayout

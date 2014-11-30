@@ -2,9 +2,11 @@ using System;
 using System.Web;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Framework;
-using Glimpse.Core.Message;
+using Glimpse.Orchard.Extensions;
+using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Extensions;
 using Glimpse.Orchard.PerfMon.Models;
+using Glimpse.Orchard.Tabs.Layers;
 using Orchard.ContentManagement.Utilities;
 using Orchard.Environment.Extensions;
 using TimerResult = Glimpse.Orchard.PerfMon.Models.TimerResult;
@@ -49,30 +51,61 @@ namespace Glimpse.Orchard.PerfMon.Services {
             };
         }
 
-        public new void PublishTimedAction(Action action)
-        {
-            PublishTimedAction(action, () => new GlimpseTimedMessage());
-        }
-
-        public new void PublishTimedAction<T>(Action action, Func<T> messageFactory) where T : ITimedPerfMonMessage
+        public new TimerResult PublishTimedAction(Action action, PerfmonCategory category, string eventName, string eventSubText = null)
         {
             var timedResult = Time(action);
-            PublishMessage(messageFactory().AsTimedMessage(timedResult));
+            PublishMessage(new TimelineMessage { EventName = eventName, EventCategory = category.ToGlimpseTimelineCategoryItem(), EventSubText = eventSubText }.AsTimedMessage(timedResult));
+
+            return timedResult;
         }
 
-        public new T PublishTimedAction<T>(Func<T> action)
+        public new TimerResult PublishTimedAction<T>(Action action, Func<T> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
         {
-            return PublishTimedAction(action, t => new GlimpseTimedMessage());
+            var timedResult = PublishTimedAction(action, category, eventName, eventSubText);
+            PublishMessage(messageFactory());
+
+            return timedResult;
         }
 
-        public new T PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory) where TMessage : ITimedPerfMonMessage
+        public new TimedActionResult<T> PublishTimedAction<T>(Func<T> action, PerfmonCategory category, string eventName, string eventSubText = null)
         {
             var timedResult = Time(action);
-            PublishMessage(messageFactory(timedResult.ActionResult).AsTimedMessage(timedResult.TimerResult));
-            return timedResult.ActionResult;
+            PublishMessage(new TimelineMessage { EventName = eventName, EventCategory = category.ToGlimpseTimelineCategoryItem(), EventSubText = eventSubText }.AsTimedMessage(timedResult.TimerResult));
+
+            return timedResult;
         }
 
-        public new void PublishMessage(object message)
+        public new TimedActionResult<T> PublishTimedAction<T>(Func<T> action, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
+        {
+            var timedResult = Time(action);
+
+            string eventSubText = null;
+            if (eventSubTextFactory != null) {
+                eventSubText = eventSubTextFactory(timedResult.ActionResult);
+            }
+
+            PublishMessage(new TimelineMessage { EventName = eventNameFactory(timedResult.ActionResult), EventCategory = category.ToGlimpseTimelineCategoryItem(), EventSubText = eventSubText }.AsTimedMessage(timedResult.TimerResult));
+
+            return timedResult;
+        }
+
+        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
+        {
+            var actionResult = PublishTimedAction(action, category, eventName, eventSubText);
+            PublishMessage(messageFactory(actionResult.ActionResult));
+
+            return actionResult;
+        }
+
+        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
+        {
+            var actionResult = PublishTimedAction(action, category, eventNameFactory, eventSubTextFactory);
+            PublishMessage(messageFactory(actionResult.ActionResult));
+
+            return actionResult;
+        }
+
+        public new void PublishMessage<T>(T message)
         {
             _messageBroker.Value.Publish(message);
         }
@@ -93,19 +126,6 @@ namespace Glimpse.Orchard.PerfMon.Services {
             }
 
             return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
-        }
-
-        private class GlimpseTimedMessage : ITimedMessage, ITimedPerfMonMessage
-        {
-            public GlimpseTimedMessage()
-            {
-                Id = Guid.NewGuid();
-            }
-
-            public Guid Id { get; private set; }
-            public TimeSpan Offset { get; set; }
-            public TimeSpan Duration { get; set; }
-            public DateTime StartTime { get; set; }
         }
 
         public class NullMessageBroker : IMessageBroker  {

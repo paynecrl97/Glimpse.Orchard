@@ -7,15 +7,12 @@ using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.Shapes
 {
-    public class ShapeMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
+    public class ShapeMessage : MessageBase, ITimedPerfMonMessage
     {
         public string Name { get; set; }
         public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime StartTime { get; set; }
-        public string EventName { get; set; }
-        public TimelineCategoryItem EventCategory { get; set; }
-        public string EventSubText { get; set; }
     }
 
     public class ShapeTab : TabBase, ITabSetup, IKey, ITabLayout

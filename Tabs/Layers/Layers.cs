@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
@@ -9,11 +8,8 @@ using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.Layers
 {
-    public class LayerMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
+    public class TimelineMessage : MessageBase, ITimelineMessage , ITimedPerfMonMessage
     {
-        public string Name { get; set; }
-        public string Rule { get; set; }
-        public bool Active { get; set; }
         public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime StartTime { get; set; }
@@ -22,7 +18,17 @@ namespace Glimpse.Orchard.Tabs.Layers
         public string EventSubText { get; set; }
     }
 
-    public class LayerTab : TabBase, ITabSetup, IKey, ITabLayout
+    public class LayerMessage : MessageBase, ITimedPerfMonMessage
+    {
+        public string Name { get; set; }
+        public string Rule { get; set; }
+        public bool Active { get; set; }
+        public TimeSpan Offset { get; set; }
+        public TimeSpan Duration { get; set; }
+        public DateTime StartTime { get; set; }
+    }
+
+    public class LayerTab : TabBase, ITabSetup, IKey//, ITabLayout
     {
         private static readonly object layout = TabLayout.Create()
             .Row(r =>
@@ -53,10 +59,10 @@ namespace Glimpse.Orchard.Tabs.Layers
             get { return "glimpse_orchard_layers"; }
         }
 
-        public object GetLayout()
-        {
-            return layout;
-        }
+        //public object GetLayout()
+        //{
+        //    return layout;
+        //}
     }
 
     //public class LayerMessagesConverter : SerializationConverter<IEnumerable<LayerMessage>>

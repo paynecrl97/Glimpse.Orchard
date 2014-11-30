@@ -60,10 +60,9 @@ namespace Glimpse.Orchard.AlternateImplementations
             return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), r => new ContentManagerMessage
             {
                 ContentId = id,
-                EventCategory = TimelineCategories.ContentManagement,
-                EventName = "Get: " + GetContentType(id, r, options),
-                EventSubText = GetContentName(r)
-            });
+                ContentType = r.ContentType,
+                Name = GetContentName(r)
+            }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), GetContentName).ActionResult;
         }
 
         public new ContentItem New(string contentType)
@@ -71,10 +70,7 @@ namespace Glimpse.Orchard.AlternateImplementations
             return _performanceMonitor.PublishTimedAction(() => base.New(contentType), r => new ContentManagerMessage
             {
                 ContentId = r.Id,
-                EventCategory = TimelineCategories.ContentManagement,
-                EventName = "New: " + r.ContentType,
-                EventSubText = GetContentName(r)
-            });
+            }, TimelineCategories.ContentManagement, "New: " + contentType, contentType).ActionResult;
         }
 
 
@@ -83,10 +79,7 @@ namespace Glimpse.Orchard.AlternateImplementations
             return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), r => new ContentManagerMessage
             {
                 ContentId = content.ContentItem.Id,
-                EventCategory = TimelineCategories.ContentManagement,
-                EventName = "Build Display: " + content.ContentItem.ContentType,
-                EventSubText = GetContentName(content)
-            });
+            }, TimelineCategories.ContentManagement, "Build Display: " + content.ContentItem.ContentType, GetContentName(content)).ActionResult;
         }
 
         private string GetContentType(int id, ContentItem item, VersionOptions options)

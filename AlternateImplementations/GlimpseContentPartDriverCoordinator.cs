@@ -45,9 +45,6 @@ namespace Glimpse.Orchard.AlternateImplementations {
                 {
                     _performanceMonitor.PublishMessage(new PartMessage
                     {
-                        EventCategory = TimelineCategories.Parts,
-                        EventName = "Build Display : " + driver.GetPartInfo().First().PartName,
-                        EventSubText = context.ContentItem.ContentType,
                         Name = context.ContentItem.ContentType,
                     }.AsTimedMessage(timedResult.TimerResult));
                 }

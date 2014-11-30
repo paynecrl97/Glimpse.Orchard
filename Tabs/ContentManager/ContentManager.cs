@@ -9,7 +9,7 @@ using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.ContentManager
 {
-    public class ContentManagerMessage : MessageBase, ITimelineMessage, ITimedPerfMonMessage
+    public class ContentManagerMessage : MessageBase, ITimedPerfMonMessage
     {
         public int ContentId { get; set; }
         public string Name { get; set; }
@@ -17,9 +17,6 @@ namespace Glimpse.Orchard.Tabs.ContentManager
         public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
         public DateTime StartTime { get; set; }
-        public string EventName { get; set; }
-        public TimelineCategoryItem EventCategory { get; set; }
-        public string EventSubText { get; set; }
     }
 
     public class ContentManagerTab : TabBase, ITabSetup, IKey, ITabLayout
