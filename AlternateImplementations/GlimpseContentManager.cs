@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Autofac;
+using Glimpse.Orchard.Extensions;
 using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.ContentManager;
@@ -9,13 +10,10 @@ using Orchard.ContentManagement;
 using Orchard.ContentManagement.Handlers;
 using Orchard.ContentManagement.MetaData;
 using Orchard.ContentManagement.Records;
-using Orchard.Core.Title.Models;
 using Orchard.Data;
 using Orchard.Data.Providers;
 using Orchard.Environment.Configuration;
 using Orchard.Environment.Extensions;
-using Orchard.Users.Models;
-using Orchard.Widgets.Models;
 
 namespace Glimpse.Orchard.AlternateImplementations
 {
@@ -57,17 +55,17 @@ namespace Glimpse.Orchard.AlternateImplementations
 
         public new ContentItem Get(int id, VersionOptions options, QueryHints hints)
         {
-            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), r => new ContentManagerMessage
+            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerMessage
             {
                 ContentId = id,
                 ContentType = r.ContentType,
-                Name = GetContentName(r)
-            }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), GetContentName).ActionResult;
+                Name = r.GetContentName()
+            }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), r=> r.GetContentName()).ActionResult;
         }
 
         public new ContentItem New(string contentType)
         {
-            return _performanceMonitor.PublishTimedAction(() => base.New(contentType), r => new ContentManagerMessage
+            return _performanceMonitor.PublishTimedAction(() => base.New(contentType), (r, t) => new ContentManagerMessage
             {
                 ContentId = r.Id,
             }, TimelineCategories.ContentManagement, "New: " + contentType, contentType).ActionResult;
@@ -76,10 +74,10 @@ namespace Glimpse.Orchard.AlternateImplementations
 
         public new dynamic BuildDisplay(IContent content, string displayType = "", string groupId = "")
         {
-            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), r => new ContentManagerMessage
+            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), (r, t) => new ContentManagerMessage
             {
                 ContentId = content.ContentItem.Id,
-            }, TimelineCategories.ContentManagement, "Build Display: " + content.ContentItem.ContentType, GetContentName(content)).ActionResult;
+            }, TimelineCategories.ContentManagement, "Build Display: " + content.ContentItem.ContentType, content.GetContentName()).ActionResult;
         }
 
         private string GetContentType(int id, ContentItem item, VersionOptions options)
@@ -89,16 +87,6 @@ namespace Glimpse.Orchard.AlternateImplementations
                 return item.ContentType;
             }
             return (options.VersionRecordId == 0) ? String.Format("Content item: {0} is not published.", id) : "Unknown content type.";
-        }
-
-        private string GetContentName(IContent content)
-        {
-            if (content.Has<TitlePart>()) { return content.As<TitlePart>().Title; }
-            if (content.Has<WidgetPart>()) { return content.As<WidgetPart>().Title; }
-            if (content.Has<UserPart>()) { return content.As<UserPart>().UserName; }
-            if (content.Has<LayerPart>()) { return content.As<LayerPart>().Name; }
-
-            return "Unknown";
         }
     }
 }

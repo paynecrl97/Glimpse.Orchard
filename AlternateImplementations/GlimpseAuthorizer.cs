@@ -1,4 +1,5 @@
-﻿using Glimpse.Orchard.Models;
+﻿using Glimpse.Orchard.Extensions;
+using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.Authorizer;
 using Orchard;
@@ -36,7 +37,21 @@ namespace Glimpse.Orchard.AlternateImplementations {
         }
 
         public new bool Authorize(Permission permission, IContent content, LocalizedString message) {
-            return _performanceMonitor.PublishTimedAction(() => base.Authorize(permission, content, message), r => new AuthorizerMessage{}, TimelineCategories.Authorization, "Authorize", permission.Name).ActionResult;
+            var authorizerMessage = new AuthorizerMessage {PermissionName = permission.Name};
+
+            if (content != null)
+            {
+                authorizerMessage.ContentId = content.Id;
+                authorizerMessage.ContentType = content.ContentItem.ContentType;
+                authorizerMessage.ContentName = content.GetContentName();
+            }
+
+            return _performanceMonitor.PublishTimedAction(() => base.Authorize(permission, content, message), (r, t) => { 
+                authorizerMessage.Duration = t.Duration;
+                authorizerMessage.UserIsAuthorized = r;
+
+                return authorizerMessage;
+            }, TimelineCategories.Authorization, "Authorize", permission.Name).ActionResult;
         }
 
     }

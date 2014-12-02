@@ -129,6 +129,7 @@
     <Compile Include="AlternateImplementations\GlimpseContentPartDriverCoordinator.cs" />
     <Compile Include="AlternateImplementations\GlimpseDisplayManager.cs" />
     <Compile Include="AlternateImplementations\GlimpseWidgetFilter.cs" />
+    <Compile Include="Extensions\ContentExtensions.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
     <Compile Include="Models\PerfmonCategory.cs" />
     <Compile Include="Extensions\PerfmonCategoryExtensions.cs" />

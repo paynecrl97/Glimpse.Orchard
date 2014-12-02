@@ -89,18 +89,18 @@ namespace Glimpse.Orchard.PerfMon.Services {
             return timedResult;
         }
 
-        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
+        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TimerResult, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
         {
             var actionResult = PublishTimedAction(action, category, eventName, eventSubText);
-            PublishMessage(messageFactory(actionResult.ActionResult));
+            PublishMessage(messageFactory(actionResult.ActionResult, actionResult.TimerResult));
 
             return actionResult;
         }
 
-        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
+        public new TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TimerResult, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
         {
             var actionResult = PublishTimedAction(action, category, eventNameFactory, eventSubTextFactory);
-            PublishMessage(messageFactory(actionResult.ActionResult));
+            PublishMessage(messageFactory(actionResult.ActionResult, actionResult.TimerResult));
 
             return actionResult;
         }

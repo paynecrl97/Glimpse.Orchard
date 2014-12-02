@@ -38,12 +38,12 @@ namespace Glimpse.Orchard.PerfMon.Services {
             return Time(action);
         }
 
-        public TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
+        public TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TimerResult, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null)
         {
             return Time(action);
         }
 
-        public TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
+        public TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T,TimerResult, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null)
         {
             return Time(action);
         }

@@ -26,8 +26,8 @@ namespace Glimpse.Orchard.PerfMon.Services
         TimerResult PublishTimedAction<T>(Action action, Func<T> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null);
         TimedActionResult<T> PublishTimedAction<T>(Func<T> action, PerfmonCategory category, string eventName, string eventSubText = null);
         TimedActionResult<T> PublishTimedAction<T>(Func<T> action, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null);
-        TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null);
-        TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null);
+        TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TimerResult, TMessage> messageFactory, PerfmonCategory category, string eventName, string eventSubText = null);
+        TimedActionResult<T> PublishTimedAction<T, TMessage>(Func<T> action, Func<T, TimerResult, TMessage> messageFactory, PerfmonCategory category, Func<T, string> eventNameFactory, Func<T, string> eventSubTextFactory = null);
 
         /// <summary>
         /// Places a message into the Performance Monitor message list 

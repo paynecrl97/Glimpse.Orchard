@@ -79,11 +79,12 @@ namespace Glimpse.Orchard.AlternateImplementations
                 try
                 {
                     var currentLayer = activeLayer;
-                    var layerRuleMatches = _performanceMonitor.PublishTimedAction(() => _ruleManager.Matches(currentLayer.Record.LayerRule), r => new LayerMessage
+                    var layerRuleMatches = _performanceMonitor.PublishTimedAction(() => _ruleManager.Matches(currentLayer.Record.LayerRule), (r, t) => new LayerMessage
                     {
                         Active = r,
                         Name = currentLayer.Record.Name,
                         Rule = currentLayer.Record.LayerRule,
+                        Duration = t.Duration
                     }, TimelineCategories.Layers, "Layer Evaluation", currentLayer.Record.Name).ActionResult;
 
                     if (layerRuleMatches)
