@@ -9,18 +9,16 @@ namespace Glimpse.Orchard.Tabs.Widgets
 {
     public class WidgetMessage : MessageBase
     {
-        public string Name { get; set; }
+        public string Title { get; set; }
         public string Type { get; set; }
         public string Zone { get; set; }
+        public string Position { get; set; }
+        public string TechnicalName { get; set; }
+        public TimeSpan Duration { get; set; }
     }
 
-    public class WidgetTab : TabBase, ITabSetup, IKey, ITabLayout
+    public class WidgetTab : TabBase, ITabSetup, IKey
     {
-        private static readonly object layout = TabLayout.Create()
-            .Row(r =>
-            {
-                r.Cell(0);
-            });
 
         public override object GetData(ITabContext context)
         {
@@ -41,22 +39,22 @@ namespace Glimpse.Orchard.Tabs.Widgets
         {
             get { return "glimpse_orchard_widgets"; }
         }
-
-        public object GetLayout()
-        {
-            return layout;
-        }
     }
 
     public class WidgetMessagesConverter : SerializationConverter<IEnumerable<WidgetMessage>>
     {
         public override object Convert(IEnumerable<WidgetMessage> messages)
         {
-            var root = new TabSection("Widget Name");
+            var root = new TabSection("Widget Title", "Widget Type", "Zone", "Position", "Technical Name", "Build Display Duration");
             foreach (var message in messages)
             {
                 root.AddRow()
-                    .Column(message.Name);
+                    .Column(message.Title)
+                    .Column(message.Type)
+                    .Column(message.Zone)
+                    .Column(message.Position)
+                    .Column(message.TechnicalName)
+                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)));
             }
 
             return root.Build();

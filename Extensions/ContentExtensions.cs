@@ -12,6 +12,7 @@ namespace Glimpse.Orchard.Extensions
             if (content.Has<TitlePart>()) { return content.As<TitlePart>().Title; }
             if (content.Has<WidgetPart>()) { return content.As<WidgetPart>().Title; }
             if (content.Has<UserPart>()) { return content.As<UserPart>().UserName; }
+            if (content.Has<WidgetPart>()) { return content.As<WidgetPart>().Title; }
             if (content.Has<LayerPart>()) { return content.As<LayerPart>().Name; }
 
             return "Unknown";
