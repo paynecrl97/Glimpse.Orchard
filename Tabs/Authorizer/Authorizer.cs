@@ -9,29 +9,18 @@ using ITimedMessage = Glimpse.Orchard.PerfMon.Models.ITimedPerfMonMessage;
 
 namespace Glimpse.Orchard.Tabs.Authorizer
 {
-    public class AuthorizerMessage : MessageBase, ITimelineMessage, ITimedMessage
+    public class AuthorizerMessage : MessageBase
     {
+        public string PermissionName { get; set; }
+        public bool UserIsAuthorized { get; set; }
         public int ContentId { get; set; }
-        public string Name { get; set; }
+        public string ContentName { get; set; }
         public string ContentType { get; set; }
-        public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
-        public DateTime StartTime { get; set; }
-        public string EventName { get; set; }
-        public TimelineCategoryItem EventCategory { get; set; }
-        public string EventSubText { get; set; }
     }
 
-    public class ContentManagerTab : TabBase, ITabSetup, IKey, ITabLayout
+    public class AuthorizerManagerTab : TabBase, ITabSetup, IKey
     {
-        private static readonly object layout = TabLayout.Create()
-            .Row(r =>
-            {
-                r.Cell(0);
-                r.Cell(1);
-                r.Cell(2);
-                r.Cell(3).Suffix(" ms").AlignRight().Class("mono");
-            });
 
         public override object GetData(ITabContext context)
         {
@@ -52,25 +41,23 @@ namespace Glimpse.Orchard.Tabs.Authorizer
         {
             get { return "glimpse_orchard_authorizer"; }
         }
-
-        public object GetLayout()
-        {
-            return layout;
-        }
     }
 
-    public class ContentManagerMessagesConverter : SerializationConverter<IEnumerable<AuthorizerMessage>>
+    public class AuthorizerMessagesConverter : SerializationConverter<IEnumerable<AuthorizerMessage>>
     {
         public override object Convert(IEnumerable<AuthorizerMessage> messages)
         {
-            var root = new TabSection("Content Id", "Name", "Content Type", "Evaluation Time");
+            var root = new TabSection("Permission Name", "User is Authorized", "Content Id", "Content Name", "Content Type", "Evaluation Time");
             foreach (var message in messages)
             {
                 root.AddRow()
-                    .Column(message.ContentId)
-                    .Column(message.Name)
+                    .Column(message.PermissionName)
+                    .Column(message.UserIsAuthorized ? "Yes" : "No")
+                    .Column((message.ContentId == 0 ? null : message.ContentId.ToString()))
+                    .Column(message.ContentName)
                     .Column(message.ContentType)
-                    .Column(message.Duration);
+                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)))
+                    .QuietIf(!message.UserIsAuthorized);
             }
 
             return root.Build();

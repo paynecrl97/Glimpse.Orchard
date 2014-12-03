@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Web.Mvc;
 using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Services;
@@ -79,14 +80,13 @@ namespace Glimpse.Orchard.AlternateImplementations
                 try
                 {
                     var currentLayer = activeLayer;
-                    var layerRuleMatches = _performanceMonitor.PublishTimedAction(() => _ruleManager.Matches(currentLayer.Record.LayerRule), r=> new LayerMessage {
+                    var layerRuleMatches = _performanceMonitor.PublishTimedAction(() => _ruleManager.Matches(currentLayer.Record.LayerRule), (r, t) => new LayerMessage
+                    {
                         Active = r,
                         Name = currentLayer.Record.Name,
-                        Rule = currentLayer.Record.LayerRule, //
-                        EventCategory = TimelineCategories.Layers,
-                        EventName = "Layer Evaluation",
-                        EventSubText = currentLayer.Record.Name,
-                    });
+                        Rule = currentLayer.Record.LayerRule,
+                        Duration = t.Duration
+                    }, TimelineCategories.Layers, "Layer Evaluation", currentLayer.Record.Name).ActionResult;
 
                     if (layerRuleMatches)
                     {
@@ -139,13 +139,18 @@ namespace Glimpse.Orchard.AlternateImplementations
                     continue;
                 }
 
-                var widgetShape = _orchardServices.ContentManager.BuildDisplay(widgetPart);
+                var scopedWidgetPart = widgetPart;
+                var widgetBuildDisplayTime = _performanceMonitor.Time(() => _orchardServices.ContentManager.BuildDisplay(scopedWidgetPart));
+                var widgetShape = widgetBuildDisplayTime.ActionResult;
 
                 _performanceMonitor.PublishMessage(new WidgetMessage
                 {
-                    Name = widgetPart.Name,
+                    Title = widgetPart.Title,
                     Type = widgetPart.ContentItem.ContentType,
-                    Zone = widgetPart.Zone
+                    Zone = widgetPart.Zone,
+                    Position = widgetPart.Position,
+                    TechnicalName = widgetPart.Name,
+                    Duration = widgetBuildDisplayTime.TimerResult.Duration
                 });
 
                 zones[widgetPart.Record.Zone].Add(widgetShape, widgetPart.Record.Position);

@@ -25,18 +25,5 @@ namespace Glimpse.Orchard.PerfMon.Extensions
 
             return message;
         }
-
-        public class GlimpseTimedMessage : ITimedPerfMonMessage
-        {
-            public GlimpseTimedMessage()
-            {
-                Id = Guid.NewGuid();
-            }
-
-            public Guid Id { get; private set; }
-            public TimeSpan Offset { get; set; }
-            public TimeSpan Duration { get; set; }
-            public DateTime StartTime { get; set; }
-        }
     }
 }

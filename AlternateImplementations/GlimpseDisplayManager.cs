@@ -158,11 +158,8 @@ namespace Glimpse.Orchard.AlternateImplementations
                 shapeMetadata.Displayed.Invoke(action => action(displayedContext), Logger);
             }, () => new ShapeMessage
             {
-                Name = shapeBinding.BindingName,
-                EventCategory = TimelineCategories.Shapes,
-                EventName = "Shape Displaying",
-                EventSubText = shapeBinding.BindingSource
-            });
+                Name = shapeBinding.BindingName
+            }, TimelineCategories.Shapes, "Shape Displaying", shapeBinding.BindingName);
 
             return shape.Metadata.ChildContent;
         }
