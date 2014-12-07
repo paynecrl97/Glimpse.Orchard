@@ -55,7 +55,6 @@ namespace Glimpse.Orchard.AlternateImplementations
 
         public IHtmlString Execute(DisplayContext context)
         {
-
             var shape = _convertAsShapeCallsite.Target(_convertAsShapeCallsite, context.Value);
 
             // non-shape arguments are returned as a no-op
@@ -67,33 +66,33 @@ namespace Glimpse.Orchard.AlternateImplementations
             if (shapeMetadata == null || string.IsNullOrEmpty(shapeMetadata.Type))
                 return CoerceHtmlString(context.Value);
 
-            var workContext = _workContextAccessor.GetContext(context.ViewContext);
-            var shapeTable = _shapeTableLocator.Value.Lookup(workContext.CurrentTheme.Id);
-
-            var displayingContext = new ShapeDisplayingContext
+            var result = _performanceMonitor.PublishTimedAction(() =>
             {
-                Shape = shape,
-                ShapeMetadata = shapeMetadata
-            };
-            _shapeDisplayEvents.Invoke(sde => sde.Displaying(displayingContext), Logger);
 
-            // find base shape association using only the fundamental shape type. 
-            // alternates that may already be registered do not affect the "displaying" event calls
-            ShapeBinding shapeBinding;
-            if (TryGetDescriptorBinding(shapeMetadata.Type, Enumerable.Empty<string>(), shapeTable, out shapeBinding))
-            {
-                shapeBinding.ShapeDescriptor.Displaying.Invoke(action => action(displayingContext), Logger);
+                var workContext = _workContextAccessor.GetContext(context.ViewContext);
+                var shapeTable = _shapeTableLocator.Value.Lookup(workContext.CurrentTheme.Id);
 
-                // copy all binding sources (all templates for this shape) in order to use them as Localization scopes
-                shapeMetadata.BindingSources = shapeBinding.ShapeDescriptor.BindingSources.Where(x => x != null).ToList();
-                if (!shapeMetadata.BindingSources.Any())
+                var displayingContext = new ShapeDisplayingContext
                 {
-                    shapeMetadata.BindingSources.Add(shapeBinding.ShapeDescriptor.BindingSource);
+                    Shape = shape,
+                    ShapeMetadata = shapeMetadata
+                };
+                _shapeDisplayEvents.Invoke(sde => sde.Displaying(displayingContext), Logger);
+
+                // find base shape association using only the fundamental shape type. 
+                // alternates that may already be registered do not affect the "displaying" event calls
+                ShapeBinding shapeBinding;
+                if (TryGetDescriptorBinding(shapeMetadata.Type, Enumerable.Empty<string>(), shapeTable, out shapeBinding))
+                {
+                    shapeBinding.ShapeDescriptor.Displaying.Invoke(action => action(displayingContext), Logger);
+
+                    // copy all binding sources (all templates for this shape) in order to use them as Localization scopes
+                    shapeMetadata.BindingSources = shapeBinding.ShapeDescriptor.BindingSources.Where(x => x != null).ToList();
+                    if (!shapeMetadata.BindingSources.Any())
+                    {
+                        shapeMetadata.BindingSources.Add(shapeBinding.ShapeDescriptor.BindingSource);
+                    }
                 }
-            }
-            
-            _performanceMonitor.PublishTimedAction(() =>
-            {
 
                 // invoking ShapeMetadata displaying events
                 shapeMetadata.Displaying.Invoke(action => action(displayingContext), Logger);
@@ -156,12 +155,14 @@ namespace Glimpse.Orchard.AlternateImplementations
 
                 // invoking ShapeMetadata displayed events
                 shapeMetadata.Displayed.Invoke(action => action(displayedContext), Logger);
-            }, () => new ShapeMessage
-            {
-                Name = shapeBinding.BindingName
-            }, TimelineCategories.Shapes, "Shape Displaying", shapeBinding.BindingName);
 
-            return shape.Metadata.ChildContent;
+                return shape.Metadata;
+            }, (r, t) => new ShapeMessage(r)
+            {
+                Duration = t.Duration
+            }, TimelineCategories.Shapes, r=> "Shape Displaying", r=> r.Type);
+
+            return result.ActionResult.ChildContent;
         }
 
         static bool TryGetDescriptorBinding(string shapeType, IEnumerable<string> shapeAlternates, ShapeTable shapeTable, out ShapeBinding shapeBinding)
