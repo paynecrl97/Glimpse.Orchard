@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using Glimpse.Orchard.PerfMon.Extensions;
+using Glimpse.Orchard.Extensions;
+using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Services;
+using Glimpse.Orchard.Tabs.Layers;
 using Glimpse.Orchard.Tabs.Parts;
 using Orchard;
 using Orchard.ContentManagement.Drivers;
@@ -41,10 +43,32 @@ namespace Glimpse.Orchard.AlternateImplementations {
 
                 if (timedResult.ActionResult)
                 {
+                    _performanceMonitor.PublishMessage(new TimelineMessage
+                    {
+                        Duration = timedResult.TimerResult.Duration,
+                        Offset = timedResult.TimerResult.Offset,
+                        StartTime = timedResult.TimerResult.StartTime,
+                        EventName = "Driver Build Display",
+                        EventCategory = TimelineCategories.Parts.ToGlimpseTimelineCategoryItem(),
+                        EventSubText = context.ContentPart.PartDefinition.Name
+                    });
+
+                    string stereotype;
+                    if (!context.ContentItem.TypeDefinition.Settings.TryGetValue("Stereotype", out stereotype))
+                    {
+                        stereotype = "Content";
+                    }
+
                     _performanceMonitor.PublishMessage(new PartMessage
                     {
-                        Name = context.ContentItem.ContentType,
-                    }.AsTimedMessage(timedResult.TimerResult));
+                        ContentItemName = context.ContentItem.GetContentName(),
+                        ContentItemType = context.ContentItem.ContentType,
+                        ContentItemStereotype = stereotype,
+                        ContentItemId = context.ContentItem.Id,
+                        Fields = context.ContentPart.Fields,
+                        ContentPartType = context.ContentPart.PartDefinition.Name,
+                        Duration = timedResult.TimerResult.Duration
+                    });
                 }
             }, Logger);
         }

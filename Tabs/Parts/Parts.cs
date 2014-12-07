@@ -1,39 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
-using Glimpse.Orchard.PerfMon.Models;
+using Orchard.ContentManagement;
 
 namespace Glimpse.Orchard.Tabs.Parts
 {
-    public class PartMessage : MessageBase, ITimedPerfMonMessage
+    public class PartMessage : MessageBase
     {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Zone { get; set; }
-        public TimeSpan Offset { get; set; }
+        public string ContentItemName { get; set; }
+        public string ContentItemType { get; set; }
+        public string ContentItemStereotype { get; set; }
+        public int ContentItemId { get; set; }
+        public string ContentPartType { get; set; }
+        public IEnumerable<ContentField> Fields { get; set; }
         public TimeSpan Duration { get; set; }
-        public DateTime StartTime { get; set; }
     }
 
-    public class PartTab : TabBase, ITabSetup, IKey, ITabLayout
-    {
-        private static readonly object layout = TabLayout.Create()
-            .Row(r =>
-            {
-                r.Cell(0);
-            });
+    //public class ContentDefinitionVM 
+    //{
+    //    public Dictionary<ContentTypeSummaryVM, IEnumerable<ContentPartSummaryVM>> Content { get; set; }
+    //}
 
+    //public class ContentTypeSummaryVM
+    //{
+    //    public string ContentItemName { get; set; }
+    //    public string ContentItemType { get; set; }
+    //    public string ContentItemStereotype { get; set; }
+    //    public int ContentItemId { get; set; }
+    //    public IEnumerable<ContentPartSummaryVM> Parts { get; set; }
+    //    public TimeSpan Duration { get; set; }
+
+    //}
+
+    //public class ContentPartSummaryVM
+    //{
+    //    public string ContentPartType { get; set; }
+    //    public IEnumerable<ContentField> Fields { get; set; }
+    //    public TimeSpan Duration { get; set; }
+    //}
+
+    public class PartTab : TabBase, ITabSetup, IKey
+    {
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<PartMessage>();
+            var messages = context.GetMessages<PartMessage>().ToList();
+
+            //var vm = new ContentDefinitionVM {
+            //    Content = new Dictionary<ContentTypeSummaryVM, IEnumerable<ContentPartSummaryVM>>()
+            //};
+
+            //foreach (var contentItem in messages.Select(m=> new ContentTypeSummaryVM{ContentItemId = m.ContentItemId}).Distinct().ToList()) {
+            //    var scopedContentItem = contentItem;
+            //    vm.Content.Add(contentItem, messages.Where(m => m.ContentItemId == scopedContentItem.ContentItemId).Select(m=> new ContentPartSummaryVM{ContentPartType = m.ContentPartType}));
+            //}
+
+            return messages;
         }
 
         public override string Name
         {
-            get { return "Parts"; }
+            get { return "Part Drivers"; }
         }
 
         public void Setup(ITabSetupContext context)
@@ -46,21 +76,22 @@ namespace Glimpse.Orchard.Tabs.Parts
             get { return "glimpse_orchard_parts"; }
         }
 
-        public object GetLayout()
-        {
-            return layout;
-        }
     }
 
     public class PartMessagesConverter : SerializationConverter<IEnumerable<PartMessage>>
     {
         public override object Convert(IEnumerable<PartMessage> messages)
         {
-            var root = new TabSection("Part Name");
+            var root = new TabSection("Content Item Name", "Content Item Type", "Content Item Stereotype", "Content Part", "Fields", "Duration");
             foreach (var message in messages)
             {
                 root.AddRow()
-                    .Column(message.Name);
+                    .Column(message.ContentItemName)
+                    .Column(message.ContentItemType)
+                    .Column(message.ContentItemStereotype)
+                    .Column(message.ContentPartType)
+                    .Column(message.Fields.Any() ? message.Fields as object : "None")
+                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)));
             }
 
             return root.Build();

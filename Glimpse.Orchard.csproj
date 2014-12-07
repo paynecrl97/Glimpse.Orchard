@@ -149,7 +149,6 @@
     <Compile Include="Tabs\Authorizer\Authorizer.cs" />
     <Compile Include="Tabs\ContentManager\ContentManager.cs" />
     <Compile Include="Tabs\Layers\Layers.cs" />
-    <Compile Include="Tabs\Fields\Fields.cs" />
     <Compile Include="Tabs\Shapes\Shapes.cs" />
     <Compile Include="Tabs\Parts\Parts.cs" />
     <Compile Include="Tabs\Widgets\Widgets.cs" />
