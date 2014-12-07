@@ -4,35 +4,49 @@ using System.Linq;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
-using Glimpse.Core.Tab.Assist;
-using Glimpse.Orchard.PerfMon.Models;
+using Orchard.ContentManagement;
 
 namespace Glimpse.Orchard.Tabs.ContentManager
 {
-    public class ContentManagerMessage : MessageBase, ITimedPerfMonMessage
+    public class ContentManagerMessage : MessageBase
     {
         public int ContentId { get; set; }
         public string Name { get; set; }
         public string ContentType { get; set; }
-        public TimeSpan Offset { get; set; }
         public TimeSpan Duration { get; set; }
-        public DateTime StartTime { get; set; }
     }
 
-    public class ContentManagerTab : TabBase, ITabSetup, IKey, ITabLayout
-    {
-        private static readonly object layout = TabLayout.Create()
-            .Row(r =>
-            {
-                r.Cell(0);
-                r.Cell(1);
-                r.Cell(2);
-                r.Cell(3).Suffix(" ms").AlignRight().Class("mono");
-            });
+    public class ContentManagerGetMessage : ContentManagerMessage
+    { 
+        public VersionOptions VersionOptions { get; set; }
+    }
 
-        public override object GetData(ITabContext context)
+    public class ContentManagerBuildDisplayMessage : ContentManagerMessage
+    {
+        public string DisplayType { get; set; }
+        public string GroupId { get; set; }
+    }
+
+    public class ContentManagerVM
+    {
+        public ContentManagerVM()
         {
-            return context.GetMessages<ContentManagerMessage>().ToList();
+            GetEvents = new List<ContentManagerGetMessage>();
+            BuildDisplayEvents = new List<ContentManagerBuildDisplayMessage>();
+        }
+
+        public List<ContentManagerGetMessage> GetEvents { get; private set; }
+        public List<ContentManagerBuildDisplayMessage> BuildDisplayEvents { get; private set; } 
+    }
+
+    public class ContentManagerTab : TabBase, ITabSetup, IKey, ILayoutControl
+    {
+        public override object GetData(ITabContext context) {
+            var vm = new ContentManagerVM();
+            vm.GetEvents.AddRange(context.GetMessages<ContentManagerGetMessage>().ToList());
+            vm.BuildDisplayEvents.AddRange(context.GetMessages<ContentManagerBuildDisplayMessage>());
+
+            return vm;
         }
 
         public override string Name
@@ -42,7 +56,8 @@ namespace Glimpse.Orchard.Tabs.ContentManager
 
         public void Setup(ITabSetupContext context)
         {
-            context.PersistMessages<ContentManagerMessage>();
+            context.PersistMessages<ContentManagerGetMessage>();
+            context.PersistMessages<ContentManagerBuildDisplayMessage>();
         }
 
         public string Key
@@ -50,27 +65,6 @@ namespace Glimpse.Orchard.Tabs.ContentManager
             get { return "glimpse_orchard_contentmanager"; }
         }
 
-        public object GetLayout()
-        {
-            return layout;
-        }
-    }
-
-    public class ContentManagerMessagesConverter : SerializationConverter<IEnumerable<ContentManagerMessage>>
-    {
-        public override object Convert(IEnumerable<ContentManagerMessage> messages)
-        {
-            var root = new TabSection("Content Id", "Name", "Content Type", "Evaluation Time");
-            foreach (var message in messages)
-            {
-                root.AddRow()
-                    .Column(message.ContentId)
-                    .Column(message.Name)
-                    .Column(message.ContentType)
-                    .Column(message.Duration);
-            }
-
-            return root.Build();
-        }
+        public bool KeysHeadings { get { return true; } }
     }
 }

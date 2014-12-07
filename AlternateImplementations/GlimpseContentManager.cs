@@ -55,28 +55,26 @@ namespace Glimpse.Orchard.AlternateImplementations
 
         public new ContentItem Get(int id, VersionOptions options, QueryHints hints)
         {
-            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerMessage
+            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerGetMessage
             {
                 ContentId = id,
                 ContentType = r.ContentType,
-                Name = r.GetContentName()
+                Name = r.GetContentName(),
+                Duration = t.Duration,
+                //VersionOptions = options
             }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), r=> r.GetContentName()).ActionResult;
         }
 
-        public new ContentItem New(string contentType)
-        {
-            return _performanceMonitor.PublishTimedAction(() => base.New(contentType), (r, t) => new ContentManagerMessage
-            {
-                ContentId = r.Id,
-            }, TimelineCategories.ContentManagement, "New: " + contentType, contentType).ActionResult;
-        }
-
-
         public new dynamic BuildDisplay(IContent content, string displayType = "", string groupId = "")
         {
-            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), (r, t) => new ContentManagerMessage
+            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), (r, t) => new ContentManagerBuildDisplayMessage
             {
                 ContentId = content.ContentItem.Id,
+                ContentType = content.ContentItem.ContentType,
+                Name = content.ContentItem.GetContentName(),
+                Duration = t.Duration,
+                DisplayType = displayType,
+                GroupId = groupId
             }, TimelineCategories.ContentManagement, "Build Display: " + content.ContentItem.ContentType, content.GetContentName()).ActionResult;
         }
 
