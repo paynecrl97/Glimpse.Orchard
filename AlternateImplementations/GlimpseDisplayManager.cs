@@ -156,13 +156,15 @@ namespace Glimpse.Orchard.AlternateImplementations
                 // invoking ShapeMetadata displayed events
                 shapeMetadata.Displayed.Invoke(action => action(displayedContext), Logger);
 
-                return shape.Metadata;
-            }, (r, t) => new ShapeMessage(r)
+                return shapeBinding;
+            }, (r, t) => new ShapeMessage(shape.Metadata)
             {
-                Duration = t.Duration
-            }, TimelineCategories.Shapes, r=> "Shape Displaying", r=> r.Type);
+                Duration = t.Duration,
+                BindingName = r.BindingName,
+                BindingSource = r.BindingSource
+            }, TimelineCategories.Shapes, r=> "Shape Displaying", r=> r.BindingSource);
 
-            return result.ActionResult.ChildContent;
+            return shape.Metadata.ChildContent;
         }
 
         static bool TryGetDescriptorBinding(string shapeType, IEnumerable<string> shapeAlternates, ShapeTable shapeTable, out ShapeBinding shapeBinding)

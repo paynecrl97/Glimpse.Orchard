@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
-using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Extensions;
 using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.Parts;

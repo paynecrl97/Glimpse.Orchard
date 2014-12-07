@@ -15,9 +15,9 @@ namespace Glimpse.Orchard.Tabs.Shapes
             _metaData = metaData;
         }
 
-        public string Name { get; set; }
         public TimeSpan Duration { get; set; }
-
+        public string BindingName { get; set; }
+        public string BindingSource { get; set; }
         public string Type { get { return _metaData.Type; } }
         public string DisplayType { get { return _metaData.DisplayType; } }
         public string Position { get { return _metaData.Position; } }
@@ -55,7 +55,7 @@ namespace Glimpse.Orchard.Tabs.Shapes
     {
         public override object Convert(IEnumerable<ShapeMessage> messages)
         {
-            var root = new TabSection("Type", "DisplayType", "Position", "PlacementSource", "Prefix", "BindingSources", "Wrappers", "Alternates", "Build Display Duration");
+            var root = new TabSection("Type", "DisplayType", "Position", "Placement Source", "Prefix", "Binding Source", "Available Binding Sources", "Wrappers", "Alternates", "Build Display Duration");
             foreach (var message in messages) {
                 if (message.Type != "Layout" //these exemptions are taken from the Shape Tracing Feature
                     && message.Type != "DocumentZone"
@@ -71,6 +71,7 @@ namespace Glimpse.Orchard.Tabs.Shapes
                         .Column(message.Position)
                         .Column(message.PlacementSource)
                         .Column(message.Prefix)
+                        .Column(message.BindingSource)
                         .Column(message.BindingSources)
                         .Column(message.Wrappers)
                         .Column(message.Alternates)
