@@ -53,6 +53,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\lib\autofac\Autofac.dll</HintPath>
     </Reference>
+    <Reference Include="Autofac.Integration.Web">
+      <HintPath>..\..\..\..\lib\autofac\Autofac.Integration.Web.dll</HintPath>
+    </Reference>
     <Reference Include="Glimpse.AspNet">
       <HintPath>..\..\..\packages\Glimpse.AspNet.1.8.0\lib\net45\Glimpse.AspNet.dll</HintPath>
     </Reference>
@@ -146,7 +149,6 @@
     <Compile Include="Tabs\Authorizer\Authorizer.cs" />
     <Compile Include="Tabs\ContentManager\ContentManager.cs" />
     <Compile Include="Tabs\Layers\Layers.cs" />
-    <Compile Include="Tabs\Fields\Fields.cs" />
     <Compile Include="Tabs\Shapes\Shapes.cs" />
     <Compile Include="Tabs\Parts\Parts.cs" />
     <Compile Include="Tabs\Widgets\Widgets.cs" />
