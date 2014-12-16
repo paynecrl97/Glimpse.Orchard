@@ -58,8 +58,8 @@ namespace Glimpse.Orchard.AlternateImplementations
             return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerGetMessage
             {
                 ContentId = id,
-                ContentType = r.ContentType,
-                Name = GetContentType(id, r, options),
+                ContentType = GetContentType(id, r, options),
+                Name = r.GetContentName(),
                 Duration = t.Duration,
                 //VersionOptions = options
             }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), r=> r.GetContentName()).ActionResult;
