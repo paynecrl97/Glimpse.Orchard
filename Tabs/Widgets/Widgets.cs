@@ -7,7 +7,10 @@ using Glimpse.Core.Tab.Assist;
 
 namespace Glimpse.Orchard.Tabs.Widgets
 {
-    public class WidgetMessage : MessageBase
+    public interface IDurationMessage {
+        TimeSpan Duration { get; set; }
+    }
+    public class WidgetMessage : MessageBase, IDurationMessage
     {
         public string Title { get; set; }
         public string Type { get; set; }
