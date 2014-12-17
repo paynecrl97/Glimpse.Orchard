@@ -148,6 +148,7 @@ namespace Glimpse.Orchard.AlternateImplementations
                     Title = widgetPart.Title,
                     Type = widgetPart.ContentItem.ContentType,
                     Zone = widgetPart.Zone,
+                    Layer = widgetPart.LayerPart,
                     Position = widgetPart.Position,
                     TechnicalName = widgetPart.Name,
                     Duration = widgetBuildDisplayTime.TimerResult.Duration
