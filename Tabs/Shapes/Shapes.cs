@@ -56,7 +56,7 @@ namespace Glimpse.Orchard.Tabs.Shapes
         public override object Convert(IEnumerable<ShapeMessage> messages)
         {
             var root = new TabSection("Type", "DisplayType", "Position", "Placement Source", "Prefix", "Binding Source", "Available Binding Sources", "Wrappers", "Alternates", "Build Display Duration");
-            foreach (var message in messages) {
+            foreach (var message in messages.OrderByDescending(m=>m.Duration.TotalMilliseconds)) {
                 if (message.Type != "Layout" //these exemptions are taken from the Shape Tracing Feature
                     && message.Type != "DocumentZone"
                     && message.Type != "PlaceChildContent"
