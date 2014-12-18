@@ -47,7 +47,7 @@ namespace Glimpse.Orchard.Tabs.Cache
         public override object Convert(IEnumerable<CacheMessage> messages)
         {
             var root = new TabSection("Action", "Key", "Result", "Value", "Time Taken");
-            foreach (var message in messages.OrderByDescending(m=>m.Duration.TotalMilliseconds))
+            foreach (var message in messages)
             {
                 root.AddRow()
                     .Column(message.Action)
