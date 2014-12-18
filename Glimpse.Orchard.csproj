@@ -150,6 +150,7 @@
     <Compile Include="Tabs\Layers\Layers.cs" />
     <Compile Include="Tabs\Shapes\Shapes.cs" />
     <Compile Include="Tabs\Parts\Parts.cs" />
+    <Compile Include="Tabs\Cache\Cache.cs" />
     <Compile Include="Tabs\Widgets\Widgets.cs" />
   </ItemGroup>
   <ItemGroup>
