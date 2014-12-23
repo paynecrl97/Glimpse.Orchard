@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Web.Mvc;
 using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Services;
@@ -23,6 +22,7 @@ using NullLogger = Orchard.Logging.NullLogger;
 
 namespace Glimpse.Orchard.AlternateImplementations
 {
+    [OrchardFeature("Glimpse.Orchard.Widgets")]
     [OrchardSuppressDependency("Orchard.Widgets.Filters.WidgetFilter")]
     public class GlimpseWidgetFilter : FilterProvider, IResultFilter
     {
