@@ -17,6 +17,7 @@ using Orchard.Environment.Extensions;
 
 namespace Glimpse.Orchard.AlternateImplementations
 {
+    [OrchardFeature("Glimpse.Orchard.ContentManager")]
     [OrchardSuppressDependency("Orchard.ContentManagement.DefaultContentManager")]
     public class GlimpseContentManager : DefaultContentManager, IContentManager
     {

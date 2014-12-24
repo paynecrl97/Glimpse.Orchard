@@ -16,6 +16,7 @@ namespace Glimpse.Orchard.AlternateImplementations {
     /// This component coordinates how parts are taking part in the rendering when some content needs to be rendered.
     /// It will dispatch BuildDisplay/BuildEditor to all <see cref="IContentPartDriver"/> implementations.
     /// </summary>
+    [OrchardFeature("Glimpse.Orchard.ContentPartDrivers")]
     [OrchardSuppressDependency("Orchard.ContentManagement.Drivers.Coordinators.ContentPartDriverCoordinator")]
     public class GlimpseContentPartDriverCoordinator : ContentPartDriverCoordinator
     {

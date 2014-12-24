@@ -24,7 +24,12 @@ namespace Glimpse.Orchard.Tabs.Authorizer
 
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<AuthorizerMessage>().ToList();
+            if (context.GetMessages<AuthorizerMessage>().Any())
+            {
+                return context.GetMessages<AuthorizerMessage>().ToList();
+            }
+
+            return "There have been no Authorization events recorded. If you think there should have been, check that the 'Glimpse for Orchard Authorizer' feature is enabled.";
         }
 
         public override string Name

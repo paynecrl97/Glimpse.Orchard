@@ -15,3 +15,18 @@ Features:
 		Name: Glimpse for Orchard Widgets
         Description: Adds detailed information about the performance of layer evaluation and widget execution to your Glimpse plugin.
 		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.Authorizer:
+		Category: Glimpse
+		Name: Glimpse for Orchard Authorizer
+        Description: Adds detailed information about the performance and results of permission authorization to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.ContentManager:
+		Category: Glimpse
+		Name: Glimpse for Orchard Content Manager
+        Description: Adds detailed information about the performance and results of the Content Manager to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.ContentPartDrivers:
+		Category: Glimpse
+		Name: Glimpse for Orchard Content Part Drivers
+        Description: Adds detailed information about the performance and results of Content Part Drivers to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
