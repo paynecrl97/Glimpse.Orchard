@@ -30,3 +30,9 @@ Features:
 		Name: Glimpse for Orchard Content Part Drivers
         Description: Adds detailed information about the performance and results of Content Part Drivers to your Glimpse plugin.
 		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.DisplayManager:
+		Category: Glimpse
+		Name: Glimpse for Orchard Display Manager
+        Description: Adds detailed information about the performance and results of the Display Manager, as well as information about the shapes that have been rendered to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+		
