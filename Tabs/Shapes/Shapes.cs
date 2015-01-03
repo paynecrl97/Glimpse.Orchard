@@ -96,7 +96,7 @@ namespace Glimpse.Orchard.Tabs.Shapes
                 .Column("")
                 .Column("")
                 .Column("")
-                .Column("Total time:")
+                .Column("Total time (includes nested times):")
                 .Column(messages.Sum(m => m.Duration.TotalMilliseconds).ToTimingString())
                 .Selected();
 
