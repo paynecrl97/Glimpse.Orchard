@@ -46,6 +46,11 @@ namespace Glimpse.Orchard.Tabs.ContentManager
             vm.GetEvents.AddRange(context.GetMessages<ContentManagerGetMessage>().ToList());
             vm.BuildDisplayEvents.AddRange(context.GetMessages<ContentManagerBuildDisplayMessage>());
 
+            if (!vm.GetEvents.Any() && ! vm.BuildDisplayEvents.Any())
+            {
+                return "There have been no Display Manager events recorded. If you think there should have been, check that the 'Glimpse for Orchard Content Manager' feature is enabled.";
+            }
+
             return vm;
         }
 

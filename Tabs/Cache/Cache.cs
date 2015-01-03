@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 
 namespace Glimpse.Orchard.Tabs.Cache
 {
@@ -53,7 +55,7 @@ namespace Glimpse.Orchard.Tabs.Cache
                     .Column(message.Key)
                     .Column(message.Result)
                     .Column(message.Value)
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)));
+                    .Column(message.Duration.ToTimingString());
             }
 
             return root.Build();

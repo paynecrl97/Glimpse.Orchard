@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using ITimedMessage = Glimpse.Orchard.PerfMon.Models.ITimedPerfMonMessage;
 
 namespace Glimpse.Orchard.Tabs.Authorizer
@@ -53,7 +54,7 @@ namespace Glimpse.Orchard.Tabs.Authorizer
         public override object Convert(IEnumerable<AuthorizerMessage> messages)
         {
             var root = new TabSection("Permission Name", "User is Authorized", "Content Id", "Content Name", "Content Type", "Evaluation Time");
-            foreach (var message in messages)
+            foreach (var message in messages.OrderByDescending(m => m.Duration))
             {
                 root.AddRow()
                     .Column(message.PermissionName)
@@ -61,7 +62,7 @@ namespace Glimpse.Orchard.Tabs.Authorizer
                     .Column((message.ContentId == 0 ? null : message.ContentId.ToString()))
                     .Column(message.ContentName)
                     .Column(message.ContentType)
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)))
+                    .Column(message.Duration.ToTimingString())
                     .QuietIf(!message.UserIsAuthorized);
             }
 

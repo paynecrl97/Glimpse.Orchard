@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using Orchard.Widgets.Models;
 
 namespace Glimpse.Orchard.Tabs.Widgets
@@ -25,7 +26,14 @@ namespace Glimpse.Orchard.Tabs.Widgets
 
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<WidgetMessage>();
+            var messages = context.GetMessages<WidgetMessage>().ToList();
+
+            if (!messages.Any())
+            {
+                return "There have been no Widget events recorded. If you think there should have been, check that the 'Glimpse for Orchard Widgets' feature is enabled.";
+            }
+
+            return messages;
         }
 
         public override string Name
@@ -49,7 +57,7 @@ namespace Glimpse.Orchard.Tabs.Widgets
         public override object Convert(IEnumerable<WidgetMessage> messages)
         {
             var root = new TabSection("Widget Title", "Widget Type", "Layer", "Layer Rule", "Zone", "Position", "Technical Name", "Build Display Duration");
-            foreach (var message in messages.OrderByDescending(m=>m.Duration.TotalMilliseconds))
+            foreach (var message in messages.OrderByDescending(m=>m.Duration))
             {
                 root.AddRow()
                     .Column(message.Title)
@@ -59,7 +67,7 @@ namespace Glimpse.Orchard.Tabs.Widgets
                     .Column(message.Zone)
                     .Column(message.Position)
                     .Column(message.TechnicalName)
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)));
+                    .Column(message.Duration.ToTimingString());
             }
 
             return root.Build();

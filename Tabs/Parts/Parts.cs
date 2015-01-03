@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using Orchard.ContentManagement;
 
 namespace Glimpse.Orchard.Tabs.Parts
@@ -49,6 +50,11 @@ namespace Glimpse.Orchard.Tabs.Parts
         {
             var messages = context.GetMessages<PartMessage>().ToList();
 
+            if (!messages.Any())
+            {
+                return "There have been no Content Part Driver events recorded. If you think there should have been, check that the 'Glimpse for Orchard Content Part Drivers' feature is enabled.";
+            }
+
             //var vm = new ContentDefinitionVM {
             //    Content = new Dictionary<ContentTypeSummaryVM, IEnumerable<ContentPartSummaryVM>>()
             //};
@@ -83,7 +89,7 @@ namespace Glimpse.Orchard.Tabs.Parts
         public override object Convert(IEnumerable<PartMessage> messages)
         {
             var root = new TabSection("Content Item Name", "Content Item Type", "Content Item Stereotype", "Content Part", "Fields", "Duration");
-            foreach (var message in messages)
+            foreach (var message in messages.OrderByDescending(m=>m.Duration))
             {
                 root.AddRow()
                     .Column(message.ContentItemName)
@@ -91,7 +97,7 @@ namespace Glimpse.Orchard.Tabs.Parts
                     .Column(message.ContentItemStereotype)
                     .Column(message.ContentPartType)
                     .Column(message.Fields.Any() ? message.Fields as object : "None")
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)));
+                    .Column(message.Duration.ToTimingString());
             }
 
             return root.Build();

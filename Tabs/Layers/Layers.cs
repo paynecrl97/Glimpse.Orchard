@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using Glimpse.Orchard.PerfMon.Models;
 
 namespace Glimpse.Orchard.Tabs.Layers
@@ -30,9 +31,15 @@ namespace Glimpse.Orchard.Tabs.Layers
     public class LayerTab : TabBase, ITabSetup, IKey
     {
 
-        public override object GetData(ITabContext context)
+        public override object GetData(ITabContext context) 
         {
-            return context.GetMessages<LayerMessage>().ToList();
+            var messages = context.GetMessages<LayerMessage>().ToList();
+
+            if (!messages.Any()) {
+                return "There have been no Layer events recorded. If you think there should have been, check that the 'Glimpse for Orchard Widgets' feature is enabled.";
+            }
+
+            return messages;
         }
 
         public override string Name
@@ -56,14 +63,14 @@ namespace Glimpse.Orchard.Tabs.Layers
         public override object Convert(IEnumerable<LayerMessage> messages)
         {
             var root = new TabSection("Layer Name", "Layer Rule", "Active", "Evaluation Time");
-            foreach (var message in messages.OrderByDescending(m=>m.Duration.TotalMilliseconds))
+            foreach (var message in messages.OrderByDescending(m=>m.Duration))
             {
                 root.AddRow()
                     .Column(message.Name)
                     .Column(message.Rule)
-                    .Column(message.Active?"Yes": "No")
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)))
-                .QuietIf(!message.Active);
+                    .Column(message.Active ? "Yes" : "No")
+                    .Column(message.Duration.ToTimingString())
+                    .QuietIf(!message.Active);
             }
 
             return root.Build();

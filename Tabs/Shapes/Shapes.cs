@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using Orchard.DisplayManagement.Shapes;
 
 namespace Glimpse.Orchard.Tabs.Shapes
@@ -32,7 +33,14 @@ namespace Glimpse.Orchard.Tabs.Shapes
     {
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<ShapeMessage>();
+            var messages = context.GetMessages<ShapeMessage>().ToList();
+
+            if (!messages.Any())
+            {
+                return "There have been no Shape events recorded. If you think there should have been, check that the 'Glimpse for Orchard Display Manager' feature is enabled.";
+            }
+
+            return messages;
         }
 
         public override string Name
@@ -75,7 +83,7 @@ namespace Glimpse.Orchard.Tabs.Shapes
                         .Column(message.BindingSources)
                         .Column(message.Wrappers)
                         .Column(message.Alternates)
-                        .Column(message.Duration);
+                        .Column(message.Duration.ToTimingString());
                 }
             }
 

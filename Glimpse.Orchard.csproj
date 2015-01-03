@@ -146,6 +146,7 @@
     <Compile Include="Permissions\Permissions.cs" />
     <Compile Include="SecurityPolicies\GlimpseSecurityPolicy.cs" />
     <Compile Include="Tabs\Authorizer\Authorizer.cs" />
+    <Compile Include="Extensions\TimespanExtensions.cs" />
     <Compile Include="Tabs\ContentManager\ContentManager.cs" />
     <Compile Include="Tabs\Layers\Layers.cs" />
     <Compile Include="Tabs\Shapes\Shapes.cs" />
