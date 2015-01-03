@@ -11,12 +11,15 @@ using Orchard.ContentManagement.Utilities;
 using Orchard.Environment.Extensions;
 using TimerResult = Glimpse.Orchard.PerfMon.Models.TimerResult;
 
-namespace Glimpse.Orchard.PerfMon.Services {
+namespace Glimpse.Orchard.PerfMon.Services
+{
     [OrchardSuppressDependency("Glimpse.Orchard.PerfMon.Services.DefaultPerformanceMonitor")]
-    public class GlimpsePerformanceMonitor : DefaultPerformanceMonitor, IPerformanceMonitor {
+    public class GlimpsePerformanceMonitor : DefaultPerformanceMonitor, IPerformanceMonitor
+    {
         private readonly LazyField<IMessageBroker> _messageBroker;
 
-        public GlimpsePerformanceMonitor() {
+        public GlimpsePerformanceMonitor()
+        {
             _messageBroker = new LazyField<IMessageBroker>();
 
             _messageBroker.Loader(GetMessageBroker);
@@ -26,7 +29,8 @@ namespace Glimpse.Orchard.PerfMon.Services {
         {
             var executionTimer = GetTimer();
 
-            if (executionTimer == null){
+            if (executionTimer == null)
+            {
                 return base.Time(action);
             }
 
@@ -39,13 +43,15 @@ namespace Glimpse.Orchard.PerfMon.Services {
 
             var executionTimer = GetTimer();
 
-            if (executionTimer == null) {
+            if (executionTimer == null)
+            {
                 return base.Time(action);
             }
 
-            var duration = executionTimer.Time(()=> { result = action(); }).ToGenericTimerResult();
+            var duration = executionTimer.Time(() => { result = action(); }).ToGenericTimerResult();
 
-            return new TimedActionResult<T> {
+            return new TimedActionResult<T>
+            {
                 ActionResult = result,
                 TimerResult = duration
             };
@@ -80,7 +86,8 @@ namespace Glimpse.Orchard.PerfMon.Services {
             var timedResult = Time(action);
 
             string eventSubText = null;
-            if (eventSubTextFactory != null) {
+            if (eventSubTextFactory != null)
+            {
                 eventSubText = eventSubTextFactory(timedResult.ActionResult);
             }
 
@@ -110,32 +117,38 @@ namespace Glimpse.Orchard.PerfMon.Services {
             _messageBroker.Value.Publish(message);
         }
 
-        private IExecutionTimer GetTimer() {
+        private IExecutionTimer GetTimer()
+        {
             var context = HttpContext.Current;
-            if (context == null) {
+            if (context == null)
+            {
                 return null;
             }
 
             return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.TimerStrategy.Invoke();
         }
 
-        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker){
+        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker)
+        {
             var context = HttpContext.Current;
-            if (context == null){
+            if (context == null)
+            {
                 return new NullMessageBroker();
             }
 
             return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
         }
 
-        public class NullMessageBroker : IMessageBroker  {
-            public void Publish<T>(T message) {}
+        public class NullMessageBroker : IMessageBroker
+        {
+            public void Publish<T>(T message) { }
 
-            public Guid Subscribe<T>(Action<T> action) {
+            public Guid Subscribe<T>(Action<T> action)
+            {
                 return Guid.NewGuid();
             }
 
-            public void Unsubscribe<T>(Guid subscriptionId) {}
+            public void Unsubscribe<T>(Guid subscriptionId) { }
         }
     }
 }

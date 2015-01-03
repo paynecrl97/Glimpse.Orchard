@@ -20,6 +20,7 @@ using Orchard.Logging;
 
 namespace Glimpse.Orchard.AlternateImplementations
 {
+    [OrchardFeature("Glimpse.Orchard.DisplayManager")]
     [OrchardSuppressDependency("Orchard.DisplayManagement.Implementation.DefaultDisplayManager")]
     public class GlimpseDisplayManager : IDisplayManager
     {

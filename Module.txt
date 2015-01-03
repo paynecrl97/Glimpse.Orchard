@@ -7,6 +7,32 @@ OrchardVersion: 1.7
 Description: Description for the module
 Features:
     Glimpse.Orchard:
-		Category: Performance
+		Category: Glimpse
 		Name: Glimpse for Orchard
         Description: Adds detailed information about the performance of your Orchard site to the Glimpse site performance monitoring tool.
+    Glimpse.Orchard.Widgets:
+		Category: Glimpse
+		Name: Glimpse for Orchard Widgets
+        Description: Adds detailed information about the performance of layer evaluation and widget execution to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.Authorizer:
+		Category: Glimpse
+		Name: Glimpse for Orchard Authorizer
+        Description: Adds detailed information about the performance and results of permission authorization to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.ContentManager:
+		Category: Glimpse
+		Name: Glimpse for Orchard Content Manager
+        Description: Adds detailed information about the performance and results of the Content Manager to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.ContentPartDrivers:
+		Category: Glimpse
+		Name: Glimpse for Orchard Content Part Drivers
+        Description: Adds detailed information about the performance and results of Content Part Drivers to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.DisplayManager:
+		Category: Glimpse
+		Name: Glimpse for Orchard Display Manager
+        Description: Adds detailed information about the performance and results of the Display Manager, as well as information about the shapes that have been rendered to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+		

@@ -17,6 +17,7 @@ using Orchard.Environment.Extensions;
 
 namespace Glimpse.Orchard.AlternateImplementations
 {
+    [OrchardFeature("Glimpse.Orchard.ContentManager")]
     [OrchardSuppressDependency("Orchard.ContentManagement.DefaultContentManager")]
     public class GlimpseContentManager : DefaultContentManager, IContentManager
     {
@@ -58,7 +59,7 @@ namespace Glimpse.Orchard.AlternateImplementations
             return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerGetMessage
             {
                 ContentId = id,
-                ContentType = r.ContentType,
+                ContentType = GetContentType(id, r, options),
                 Name = r.GetContentName(),
                 Duration = t.Duration,
                 //VersionOptions = options

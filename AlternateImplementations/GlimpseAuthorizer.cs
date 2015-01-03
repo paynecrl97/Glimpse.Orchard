@@ -11,6 +11,7 @@ using Orchard.Security.Permissions;
 using Orchard.UI.Notify;
 
 namespace Glimpse.Orchard.AlternateImplementations {
+    [OrchardFeature("Glimpse.Orchard.Authorizer")]
     [OrchardSuppressDependency("Orchard.Security.Authorizer")]
     public class GlimpseAuthorizer : Authorizer, IAuthorizer {
         private readonly IPerformanceMonitor _performanceMonitor;

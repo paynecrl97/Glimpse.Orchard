@@ -5,6 +5,7 @@ using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
 using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using ITimedMessage = Glimpse.Orchard.PerfMon.Models.ITimedPerfMonMessage;
 
 namespace Glimpse.Orchard.Tabs.Authorizer
@@ -24,7 +25,12 @@ namespace Glimpse.Orchard.Tabs.Authorizer
 
         public override object GetData(ITabContext context)
         {
-            return context.GetMessages<AuthorizerMessage>().ToList();
+            if (context.GetMessages<AuthorizerMessage>().Any())
+            {
+                return context.GetMessages<AuthorizerMessage>().ToList();
+            }
+
+            return "There have been no Authorization events recorded. If you think there should have been, check that the 'Glimpse for Orchard Authorizer' feature is enabled.";
         }
 
         public override string Name
@@ -48,7 +54,7 @@ namespace Glimpse.Orchard.Tabs.Authorizer
         public override object Convert(IEnumerable<AuthorizerMessage> messages)
         {
             var root = new TabSection("Permission Name", "User is Authorized", "Content Id", "Content Name", "Content Type", "Evaluation Time");
-            foreach (var message in messages)
+            foreach (var message in messages.OrderByDescending(m => m.Duration))
             {
                 root.AddRow()
                     .Column(message.PermissionName)
@@ -56,9 +62,18 @@ namespace Glimpse.Orchard.Tabs.Authorizer
                     .Column((message.ContentId == 0 ? null : message.ContentId.ToString()))
                     .Column(message.ContentName)
                     .Column(message.ContentType)
-                    .Column(string.Format("{0} ms", Math.Round(message.Duration.TotalMilliseconds, 2)))
+                    .Column(message.Duration.ToTimingString())
                     .QuietIf(!message.UserIsAuthorized);
             }
+
+            root.AddRow()
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("Total time:")
+                .Column(messages.Sum(m=>m.Duration.TotalMilliseconds).ToTimingString())
+                .Selected();
 
             return root.Build();
         }
