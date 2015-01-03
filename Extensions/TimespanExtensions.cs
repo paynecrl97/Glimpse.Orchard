@@ -8,7 +8,7 @@ namespace Glimpse.Orchard.Extensions {
         }
         public static string ToTimingString(this double milliseconds)
         {
-            return string.Format("{0} ms", Math.Round(milliseconds, 2));
+            return string.Format("{0:0,0.00} ms", milliseconds);
         }
     }
 }
