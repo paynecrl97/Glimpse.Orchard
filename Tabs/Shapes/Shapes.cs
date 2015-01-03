@@ -87,6 +87,19 @@ namespace Glimpse.Orchard.Tabs.Shapes
                 }
             }
 
+            root.AddRow()
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("Total time:")
+                .Column(messages.Sum(m => m.Duration.TotalMilliseconds).ToTimingString())
+                .Selected();
+
             return root.Build();
         }
     }

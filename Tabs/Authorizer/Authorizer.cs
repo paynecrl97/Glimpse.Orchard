@@ -66,6 +66,15 @@ namespace Glimpse.Orchard.Tabs.Authorizer
                     .QuietIf(!message.UserIsAuthorized);
             }
 
+            root.AddRow()
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("")
+                .Column("Total time:")
+                .Column(messages.Sum(m=>m.Duration.TotalMilliseconds).ToTimingString())
+                .Selected();
+
             return root.Build();
         }
     }
