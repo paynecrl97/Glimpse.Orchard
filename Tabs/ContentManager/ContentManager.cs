@@ -4,6 +4,8 @@ using System.Linq;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Message;
+using Glimpse.Core.Tab.Assist;
+using Glimpse.Orchard.Extensions;
 using Orchard.ContentManagement;
 
 namespace Glimpse.Orchard.Tabs.ContentManager
@@ -71,5 +73,44 @@ namespace Glimpse.Orchard.Tabs.ContentManager
         }
 
         public bool KeysHeadings { get { return true; } }
+    }
+
+    public class ContentManagerGetMessagesConverter : SerializationConverter<IEnumerable<ContentManagerGetMessage>>
+    {
+        public override object Convert(IEnumerable<ContentManagerGetMessage> messages)
+        {
+            var root = new TabSection("Content Id", "Content Type", "Name", "Version Options", "Duration");
+            foreach (var message in messages.OrderByDescending(m => m.Duration))
+            {
+                root.AddRow()
+                    .Column(message.ContentId)
+                    .Column(message.ContentType)
+                    .Column(message.Name)
+                    .Column(message.VersionOptions)
+                    .Column(message.Duration.ToTimingString());
+            }
+
+            return root.Build();
+        }
+    }
+
+    public class ContentManagerBuildDisplayMessagesConverter : SerializationConverter<IEnumerable<ContentManagerBuildDisplayMessage>>
+    {
+        public override object Convert(IEnumerable<ContentManagerBuildDisplayMessage> messages)
+        {
+            var root = new TabSection("Content Id", "Content Type", "Name", "Display Type", "Group Id", "Duration");
+            foreach (var message in messages.OrderByDescending(m => m.Duration))
+            {
+                root.AddRow()
+                    .Column(message.ContentId)
+                    .Column(message.ContentType)
+                    .Column(message.Name)
+                    .Column(message.DisplayType)
+                    .Column(message.GroupId)
+                    .Column(message.Duration.ToTimingString());
+            }
+
+            return root.Build();
+        }
     }
 }
