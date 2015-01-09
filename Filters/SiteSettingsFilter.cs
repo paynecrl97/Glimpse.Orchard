@@ -29,11 +29,14 @@ namespace Glimpse.Orchard.Filters
                 {
                     var propertyType = property.PropertyType;
                     // Supported types (we also know they are not indexed properties).
-                    if (propertyType == typeof (string) || propertyType == typeof (bool) || propertyType == typeof (int)) {
+                    if ((propertyType == typeof(string) || propertyType == typeof(bool) || propertyType == typeof(int)) 
+                        && property.CanRead) {
+                        var value = property.GetValue(sitePart, null);
+
                         _performanceMonitor.PublishMessage(new SiteSettingsMessage {
                             Part = sitePart.PartDefinition.Name,
                             Name = property.Name,
-                            Value = property.GetValue(sitePart)
+                            Value = value
                         });
                     }
                 }
