@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
 using Glimpse.Orchard.PerfMon.Services;
 using Glimpse.Orchard.Tabs.SiteSettings;
@@ -27,17 +28,22 @@ namespace Glimpse.Orchard.Filters
             {
                 foreach (var property in sitePart.GetType().GetProperties().Where(p=>p.Name!="Id"))//id will always be 1 because this part is bound to the site
                 {
-                    var propertyType = property.PropertyType;
-                    // Supported types (we also know they are not indexed properties).
-                    if ((propertyType == typeof(string) || propertyType == typeof(bool) || propertyType == typeof(int)) 
-                        && property.CanRead) {
-                        var value = property.GetValue(sitePart, null);
+                    try {
+                        var propertyType = property.PropertyType;
+                        // Supported types (we also know they are not indexed properties).
+                        if ((propertyType == typeof (string) || propertyType == typeof (bool) || propertyType == typeof (int))
+                            && property.CanRead) {
+                            var value = property.GetValue(sitePart, null);
 
-                        _performanceMonitor.PublishMessage(new SiteSettingsMessage {
-                            Part = sitePart.PartDefinition.Name,
-                            Name = property.Name,
-                            Value = value
-                        });
+                            _performanceMonitor.PublishMessage(new SiteSettingsMessage {
+                                Part = sitePart.PartDefinition.Name,
+                                Name = property.Name,
+                                Value = value
+                            });
+                        }
+                    }
+                    catch (Exception ex) {
+                        //todo: figure out why this occaisionally fails
                     }
                 }
             }
