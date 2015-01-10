@@ -15,45 +15,21 @@ namespace Glimpse.Orchard.Tabs.ContentManager
         public int ContentId { get; set; }
         public string Name { get; set; }
         public string ContentType { get; set; }
-        public TimeSpan Duration { get; set; }
-    }
-
-    public class ContentManagerGetMessage : ContentManagerMessage
-    { 
         public VersionOptions VersionOptions { get; set; }
-    }
-
-    public class ContentManagerBuildDisplayMessage : ContentManagerMessage
-    {
-        public string DisplayType { get; set; }
-        public string GroupId { get; set; }
-    }
-
-    public class ContentManagerVM
-    {
-        public ContentManagerVM()
-        {
-            GetEvents = new List<ContentManagerGetMessage>();
-            BuildDisplayEvents = new List<ContentManagerBuildDisplayMessage>();
-        }
-
-        public List<ContentManagerGetMessage> GetEvents { get; private set; }
-        public List<ContentManagerBuildDisplayMessage> BuildDisplayEvents { get; private set; } 
+        public TimeSpan Duration { get; set; }
     }
 
     public class ContentManagerTab : TabBase, ITabSetup, IKey, ILayoutControl
     {
         public override object GetData(ITabContext context) {
-            var vm = new ContentManagerVM();
-            vm.GetEvents.AddRange(context.GetMessages<ContentManagerGetMessage>().ToList());
-            vm.BuildDisplayEvents.AddRange(context.GetMessages<ContentManagerBuildDisplayMessage>());
+            var messages = context.GetMessages<ContentManagerMessage>().ToList();
 
-            if (!vm.GetEvents.Any() && ! vm.BuildDisplayEvents.Any())
+            if (!messages.Any())
             {
                 return "There have been no Display Manager events recorded. If you think there should have been, check that the 'Glimpse for Orchard Content Manager' feature is enabled.";
             }
 
-            return vm;
+            return messages;
         }
 
         public override string Name
@@ -63,8 +39,7 @@ namespace Glimpse.Orchard.Tabs.ContentManager
 
         public void Setup(ITabSetupContext context)
         {
-            context.PersistMessages<ContentManagerGetMessage>();
-            context.PersistMessages<ContentManagerBuildDisplayMessage>();
+            context.PersistMessages<ContentManagerMessage>();
         }
 
         public string Key
@@ -75,9 +50,9 @@ namespace Glimpse.Orchard.Tabs.ContentManager
         public bool KeysHeadings { get { return true; } }
     }
 
-    public class ContentManagerGetMessagesConverter : SerializationConverter<IEnumerable<ContentManagerGetMessage>>
+    public class ContentManagerGetMessagesConverter : SerializationConverter<IEnumerable<ContentManagerMessage>>
     {
-        public override object Convert(IEnumerable<ContentManagerGetMessage> messages)
+        public override object Convert(IEnumerable<ContentManagerMessage> messages)
         {
             var root = new TabSection("Content Id", "Content Type", "Name", "Version Options", "Duration");
             foreach (var message in messages.OrderByDescending(m => m.Duration))
@@ -91,35 +66,6 @@ namespace Glimpse.Orchard.Tabs.ContentManager
             }
 
             root.AddRow()
-                .Column("")
-                .Column("")
-                .Column("")
-                .Column("Total time:")
-                .Column(messages.Sum(m => m.Duration.TotalMilliseconds).ToTimingString())
-                .Selected();
-
-            return root.Build();
-        }
-    }
-
-    public class ContentManagerBuildDisplayMessagesConverter : SerializationConverter<IEnumerable<ContentManagerBuildDisplayMessage>>
-    {
-        public override object Convert(IEnumerable<ContentManagerBuildDisplayMessage> messages)
-        {
-            var root = new TabSection("Content Id", "Content Type", "Name", "Display Type", "Group Id", "Duration");
-            foreach (var message in messages.OrderByDescending(m => m.Duration))
-            {
-                root.AddRow()
-                    .Column(message.ContentId)
-                    .Column(message.ContentType)
-                    .Column(message.Name)
-                    .Column(message.DisplayType)
-                    .Column(message.GroupId)
-                    .Column(message.Duration.ToTimingString());
-            }
-
-            root.AddRow()
-                .Column("")
                 .Column("")
                 .Column("")
                 .Column("")

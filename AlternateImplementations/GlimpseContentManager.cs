@@ -56,7 +56,7 @@ namespace Glimpse.Orchard.AlternateImplementations
 
         public new ContentItem Get(int id, VersionOptions options, QueryHints hints)
         {
-            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerGetMessage
+            return _performanceMonitor.PublishTimedAction(() => base.Get(id, options, hints), (r, t) => new ContentManagerMessage
             {
                 ContentId = id,
                 ContentType = GetContentType(id, r, options),
@@ -64,19 +64,6 @@ namespace Glimpse.Orchard.AlternateImplementations
                 Duration = t.Duration,
                 //VersionOptions = options
             }, TimelineCategories.ContentManagement, r => "Get: " + GetContentType(id, r, options), r=> r.GetContentName()).ActionResult;
-        }
-
-        public new dynamic BuildDisplay(IContent content, string displayType = "", string groupId = "")
-        {
-            return _performanceMonitor.PublishTimedAction(() => base.BuildDisplay(content, displayType, groupId), (r, t) => new ContentManagerBuildDisplayMessage
-            {
-                ContentId = content.ContentItem.Id,
-                ContentType = content.ContentItem.ContentType,
-                Name = content.ContentItem.GetContentName(),
-                Duration = t.Duration,
-                DisplayType = displayType,
-                GroupId = groupId
-            }, TimelineCategories.ContentManagement, "Build Display: " + content.ContentItem.ContentType, content.GetContentName()).ActionResult;
         }
 
         private string GetContentType(int id, ContentItem item, VersionOptions options)
