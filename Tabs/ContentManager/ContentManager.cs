@@ -47,7 +47,7 @@ namespace Glimpse.Orchard.Tabs.ContentManager
             get { return "glimpse_orchard_contentmanager"; }
         }
 
-        public bool KeysHeadings { get { return true; } }
+        public bool KeysHeadings { get { return false; } }
     }
 
     public class ContentManagerGetMessagesConverter : SerializationConverter<IEnumerable<ContentManagerMessage>>
