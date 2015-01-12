@@ -134,6 +134,8 @@
     <Compile Include="Filters\SiteSettingsFilter.cs" />
     <Compile Include="Filters\EnabledFeaturesFilter.cs" />
     <Compile Include="GlimpseSecurityPolicy.cs" />
+    <Compile Include="MessageBrokers\IPerformanceMessageBroker.cs" />
+    <Compile Include="MessageBrokers\DefaultMessageBroker.cs" />
     <Compile Include="Models\PerfmonCategory.cs" />
     <Compile Include="Extensions\PerfmonCategoryExtensions.cs" />
     <Compile Include="Models\TimelineCategories.cs" />

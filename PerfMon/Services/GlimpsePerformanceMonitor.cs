@@ -1,14 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.Web;
 using Glimpse.Core.Extensibility;
 using Glimpse.Core.Framework;
 using Glimpse.Orchard.Extensions;
+using Glimpse.Orchard.MessageBrokers;
 using Glimpse.Orchard.Models;
 using Glimpse.Orchard.PerfMon.Extensions;
 using Glimpse.Orchard.PerfMon.Models;
 using Glimpse.Orchard.Tabs.Layers;
-using Orchard.ContentManagement.Utilities;
+using Orchard;
 using Orchard.Environment.Extensions;
+using Orchard.Localization;
+using ILogger = Orchard.Logging.ILogger;
+using NullLogger = Orchard.Logging.NullLogger;
 using TimerResult = Glimpse.Orchard.PerfMon.Models.TimerResult;
 
 namespace Glimpse.Orchard.PerfMon.Services
@@ -16,14 +21,17 @@ namespace Glimpse.Orchard.PerfMon.Services
     [OrchardSuppressDependency("Glimpse.Orchard.PerfMon.Services.DefaultPerformanceMonitor")]
     public class GlimpsePerformanceMonitor : DefaultPerformanceMonitor, IPerformanceMonitor
     {
-        private readonly LazyField<IMessageBroker> _messageBroker;
+        private readonly IEnumerable<IPerformanceMessageBroker> _messageBrokers;
 
-        public GlimpsePerformanceMonitor()
+        public GlimpsePerformanceMonitor(IEnumerable<IPerformanceMessageBroker> messageBrokers)
         {
-            _messageBroker = new LazyField<IMessageBroker>();
-
-            _messageBroker.Loader(GetMessageBroker);
+            _messageBrokers = messageBrokers;
+            Logger = NullLogger.Instance;
+            T = NullLocalizer.Instance;
         }
+
+        public ILogger Logger { get; set; }
+        public Localizer T { get; private set; }
 
         public new TimerResult Time(Action action)
         {
@@ -114,7 +122,7 @@ namespace Glimpse.Orchard.PerfMon.Services
 
         public new void PublishMessage<T>(T message)
         {
-            _messageBroker.Value.Publish(message);
+            _messageBrokers.Invoke(broker =>broker.Publish(message), Logger);
         }
 
         private IExecutionTimer GetTimer()
@@ -126,29 +134,6 @@ namespace Glimpse.Orchard.PerfMon.Services
             }
 
             return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.TimerStrategy.Invoke();
-        }
-
-        private IMessageBroker GetMessageBroker(IMessageBroker messageBroker)
-        {
-            var context = HttpContext.Current;
-            if (context == null)
-            {
-                return new NullMessageBroker();
-            }
-
-            return ((GlimpseRuntime)context.Application.Get("__GlimpseRuntime")).Configuration.MessageBroker;
-        }
-
-        public class NullMessageBroker : IMessageBroker
-        {
-            public void Publish<T>(T message) { }
-
-            public Guid Subscribe<T>(Action<T> action)
-            {
-                return Guid.NewGuid();
-            }
-
-            public void Unsubscribe<T>(Guid subscriptionId) { }
         }
     }
 }
