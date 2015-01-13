@@ -13,8 +13,8 @@ Features:
     Glimpse.Orchard.Widgets:
 		Category: Glimpse
 		Name: Glimpse for Orchard Widgets
-        Description: Adds detailed information about the performance of layer evaluation and widget execution to your Glimpse plugin.
-		Dependencies: Glimpse.Orchard
+        Description: Adds detailed information about the performance of widget execution and layer evaluation to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard, Orchard.Widgets
     Glimpse.Orchard.Authorizer:
 		Category: Glimpse
 		Name: Glimpse for Orchard Authorizer
@@ -34,5 +34,15 @@ Features:
 		Category: Glimpse
 		Name: Glimpse for Orchard Display Manager
         Description: Adds detailed information about the performance and results of the Display Manager, as well as information about the shapes that have been rendered to your Glimpse plugin.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.EnabledFeatures:
+		Category: Glimpse
+		Name: Glimpse for Orchard Enabled Features
+        Description: Populates the 'Enabled Features' tab of your Glimpse plugin with a list of the currently enabled features.
+		Dependencies: Glimpse.Orchard
+    Glimpse.Orchard.SiteSettings:
+		Category: Glimpse
+		Name: Glimpse for Orchard Site Settings
+        Description: Populates the 'Site Settings' tab of your Glimpse plugin with the values of each of this site's settings.
 		Dependencies: Glimpse.Orchard
 		
